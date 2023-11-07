@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        div {
+            margin-bottom: 15px;
+            padding: 4px 12px;
+            text-align: center;
+        }
+
+        .info {
+            background-color: rgb(242, 241, 227);
+        }
+    </style>
+</head>
+
+<body class="info">
+
+    <div>
+        <p><strong>* Taastamise info! *</strong></p>
+        <p><strong>(ctrl + v)</strong></p>
+        <p></p>
+        <p id="emp1"></p>
+        <p id="txt1"></p>
+        <p id="txt2"></p>
+    </div>
+
+</body>
+<script type="text/javascript">
+    let zTxt1 = "Nüüd on valitud sümbol kopeeritud mällu. Avage väli (kui see juba pole avatud!) ja asetage kursor kohta kuhu tahate kopeeritud sümbolit taastada ja valige klahvi kombinatsioon ctrl + v.";
+
+    document.getElementById("txt1").innerHTML = zTxt1;
+  
+</script>
+<script type="text/javascript">
+    setTimeout(() => { parent.dhxWins.window("startee").close(); }, 10000);
+</script>
+
+</html>

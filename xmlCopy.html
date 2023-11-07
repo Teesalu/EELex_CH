@@ -1,0 +1,111 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+    <title>Eksport Xml</title>
+    <script type="text/javascript" src="tools_dx.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+    <script type="text/javascript">
+
+        var dic_desc, sAppLang, PD, retVal, usrName, volId;
+        PD = "\uE001";
+
+
+
+        /**
+       * ATS-xmlCopy
+       * 
+       * @method bodyOnLoad
+       */
+        function bodyOnLoad() {
+
+            var inArg = parent.cDialogArg;
+
+            //window.alert(inArg);
+
+            var aSplitArray = inArg.split(PD);
+            dic_desc = aSplitArray[0];
+            sAppLang = aSplitArray[1];
+            usrName = aSplitArray[3];
+            volId = aSplitArray[4];
+            dicText = aSplitArray[5];
+             
+            
+            spnVols.innerHTML = dicText;
+            
+            
+            document.title = document.title + ": " + dic_desc;
+
+        }
+
+        /**
+        * ATS-xmlCopy
+        * 
+        * @method divBtnOnClick
+        */
+        function divBtnOnClick() {
+            idDivBtn.disabled = true;
+            var xh;
+            xh = exCGISync("../tools.cgi", "xmlCopy" + PD + dic_desc + PD + usrName);
+            if (xh.statusText == "OK") {
+                //window.alert("OK!");
+
+                rspDOM = IDD("", "", false, false, null);
+                loadStatus = ParseHTTPResponse(xh);
+                if (loadStatus) {
+                    var opStatus = getXmlSingleNodeValue(rspDOM, "rsp/outDOM/f");
+                    var cTxtDom = BuildXMLFromString(xh.responseText);
+                    var ooTNodes = cTxtDom.getElementsByTagName('f');
+                    var tekst = ooTNodes.item(0).textContent;
+                    //window.alert(tekst);
+ 
+                    idDivLink.innerHTML = "<a href='../" + tekst + "'>XML koopia fail</a>";
+                    window.alert("Koopia tehtud ja klõpsa nüüd linki...");
+                }
+            } else {
+                window.alert("ERROR!");
+            }
+
+            //idDivBtn.disabled = false;
+        }
+
+        /**
+        *  Teeb XML prefiksist nimeruumi URI.
+        * 
+        * @method NSResolver
+        * @param {String} nsPrefix
+        */
+        function NSResolver(nsPrefix) {
+            if (nsPrefix == DICPR) {
+                return DICURI;
+            } else if (nsPrefix == SDPR) {
+                return SDURI;
+            } else if (nsPrefix == NS_XS_PR) {
+                return NS_XS;
+            } else if (nsPrefix == "xml") {
+                return NS_XML;
+            } else if (nsPrefix == NS_XSL_PR) {
+                return NS_XSL;
+            }
+            return null;
+        }
+    </script>
+
+</head>
+
+<body style="background-color:white" onload="bodyOnLoad()">
+    <div id="idBody" style="PADDING-LEFT: 10mm; PADDING-TOP: 5mm">
+        <br />
+        <span id="spnVols"></span>
+        <div id="idDivLink"></div>
+        <br />
+        <br />
+        <input id="idDivBtn" type="button" value="XML koopia (kõik köitted)" onclick="divBtnOnClick()" />
+     </div>
+</body>
+
+</html>

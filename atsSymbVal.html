@@ -1,0 +1,214 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Märgid ja sümbolid</title>
+    <script type="text/javascript" src="atsSym_dx.js"></script>
+    <script type="text/javascript">
+        var inArg = parent.cDialogArg;
+        function bodyOnLoad() {
+            switch (inArg) {
+                case "mnu01":
+                    var ccP1 = "Muutujad ja kirjastiilid."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu02":
+                    var ccP1 = "Ladina tähestik A-L."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu03":
+                    var ccP1 = "Ladina tähestik M-Z."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu04":
+                    var ccP1 = "Ligatuurid ja sümbolid."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu05":
+                    var ccP1 = "Kreeka tähestik."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu06":
+                    var ccP1 = "Vene tähestik."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu07":
+                    var ccP1 = "Poolitusvihje."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+
+                    break;
+                case "mnu08":
+                    var ccP1 = "Etüm. sümbolid."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                    break;
+                case "mnu09":
+                    var ccP1 = "Hääldusmärgid."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+                case "mnu10":
+                    var ccP1 = "Komb. diakr. märgid."
+                    var ccSymbDef = atsSymbDef(inArg);
+                    if (ccSymbDef != "") {
+                        document.getElementById("PK").innerHTML = ccP1
+                        document.getElementById("id_body").innerHTML = ccSymbDef;
+                    }
+            }
+        }
+        /**
+          * Symbolz_2 
+          * @method mySym()
+          * @param {String} cSymbc
+          */
+        function mySym(cSymbc) {
+
+            var m = document;
+            txt = m.createTextNode(cSymbc);
+            var w = window;
+            var b = m.body;
+            b.appendChild(txt);
+            if (b.createTextRange) {
+                var d = b.createTextRange();
+                d.moveToElementText(txt);
+                d.select();
+                m.execCommand('copy');
+            }
+            else {
+                var d = m.createRange();
+                var g = w.getSelection;
+                d.selectNodeContents(txt);
+                g().removeAllRanges();
+                g().addRange(d);
+                m.execCommand('copy');
+                g().removeAllRanges();
+            }
+            txt.remove();
+            //parent.atsSendMessage("0", "Sümbol [ " + cSymbc + " ] on kopeeritud ja edasi kasutage PASTE operatsiooni!", 15000);
+ 
+
+            if (parent.dViewPasteInfo == true) {
+                parent.atsPasteInfo(cSymbc);
+                parent.dViewPasteInfo = false;
+            } else {
+                parent.atsSendMessage("0", "Sümbol [ " + cSymbc + " ] on kopeeritud ja edasi kasutage -> CTRL + V", 10000);
+            }
+
+
+
+        }
+        /**
+         * Väljub html-st
+         * 
+         * @method CloseClick
+         */
+        function CloseClick() {
+            parent.atsClose();
+            parent.dhxWins.window("winTyybid").close();
+        } //CloseClick
+
+    </script>
+
+    <!--css-->
+    <style>
+        .myDiv {
+            text-align: center;
+        }
+
+        html,
+        h1 {
+            background-color: white;
+            color: grey;
+            text-align: center;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: auto;
+            color: black;
+
+
+
+        }
+
+        .btn {
+            border: none;
+            background-color: white;
+            padding: 4px 4px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .dia {
+            border: none;
+            background-color: white;
+            padding: 6px 6px;
+            font-size: 20px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+
+
+
+        .btn:hover {
+            background: #aaa;
+        }
+
+        .dia:hover {
+            background: #aaa;
+        }
+    </style>
+
+</head>
+<h1 id="PK"></h1>
+
+<body onload="bodyOnLoad()">
+    <div class="myDiv" id='id_body'>
+    </div>
+    <br>
+    <hr>
+    <div class="myDiv" id='id_close2'>
+        <input id="close" name="close" onclick="CloseClick()" type="button" value="Väljun" tabindex="1">
+    </div>
+</body>
+
+</html>

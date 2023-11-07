@@ -1,0 +1,476 @@
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script language=vbscript type="text/vbscript" src="res_xml.vbs"></script>
+    <script language=vbscript type="text/vbscript">
+<!--
+Option Explicit
+
+
+Dim cssDOM
+Dim crBgCol, crI '"conf row backgr color", "conf row index"
+Dim itmType
+
+
+'-----------------------------------------------------------------------------------
+Sub bodyOnLoad()
+Dim aParms, itm, itmName, itmVal, sItmQN, sKirjeldav, sAppLang
+
+if IsArray(window.dialogArguments) then
+
+    aParms = window.dialogArguments
+
+    itm = aParms(0)
+    itmName = aParms(1)
+    itmVal = aParms(2)
+    sItmQN = aParms(3)
+    sKirjeldav = aParms(4)
+    itmType = aParms(5)
+    sAppLang = aParms(6)
+    
+end if
+
+Dim lc
+set lc = langConst.all("langConst_" & sAppLang)
+Call window.execScript(lc.innerText, "JScript")
+
+document.title = STYLE_TEXT & ": " & sKirjeldav & " (" & sItmQN & ") " & Left(itmType, 2)
+
+th_itm.innerText = ITM_TEXT
+th_itmName.innerText = ITM_NAME_TEXT
+th_itmVal.innerText = ITM_VAL_TEXT
+
+td_itm.innerHTML = itm
+td_itmName.innerHTML = itmName
+td_itmVal.innerHTML = itmVal
+
+naitedCaption.innerHTML = "<u>" & ITM_CPT_TEXT & "</u>"
+hng.innerHTML = ITM_HNG_TEXT
+itxt.innerHTML = ITM_INFO_TEXT
+att.innerHTML = ITM_ATTR_TEXT
+txt.innerHTML = ITM_TXT_TEXT
+cmt.innerHTML = ITM_CMT_TEXT
+
+styleSelectLabel.innerHTML = STYLE_TEXT
+
+'stiilid
+Dim cssItems, cssItem, opt
+
+set opt = document.createElement("option") 'tühi, et saaks alati millegi teise valida ...
+styleItem.options.add(opt)
+
+set cssDOM = procs.InitDomDoc("File", "styles.xml", False, False, Nothing)
+if (cssDOM.parseError.errorCode = 0) then
+    set cssItems = cssDOM.documentElement.selectNodes("item")
+    for each cssItem in cssItems
+        set opt = document.createElement("option")
+        styleItem.options.add(opt)
+        opt.innerText = cssItem.getAttribute("id")
+        opt.id = cssItem.getAttribute("id")
+    next
+else
+    set cssDOM = Nothing
+end if
+
+eNBdy.rows(0).childNodes(0).click()
+
+Call setCurrentCSS(itmVal)
+
+End Sub 'bodyOnLoad
+
+
+'-----------------------------------------------------------------------------------
+Sub setCurrentCSS(cssText)
+if (Left(itmType, 2) = "en" or Left(itmType, 2) = "ec") then
+    hng.style.cssText = cssText
+elseif (Left(itmType, 2) = "it") then
+    itxt.style.cssText = cssText
+elseif (Left(itmType, 2) = "at") then
+    att.style.cssText = cssText
+elseif (Left(itmType, 2) = "et") then
+    txt.style.cssText = cssText
+elseif (Left(itmType, 2) = "ct") then
+    cmt.style.cssText = cssText
+end if
+End Sub 'setCurrentCSS
+
+
+'-----------------------------------------------------------------------------------
+Sub enbdyOnClick()
+
+Dim oConfRow
+set oConfRow = window.event.srcElement.parentElement
+
+if Not IsEmpty(crI) then
+    eNBdy.rows(crI).style.backgroundColor = crBgCol
+end if
+
+crI = oConfRow.sectionRowIndex
+crBgCol = oConfRow.style.backgroundColor
+oConfRow.style.backgroundColor = "gainsboro"
+
+styleSelect.innerHTML = ""
+Dim tarr, i, opt, stVal
+
+stVal = oConfRow.cells(2).innerText
+if (Left(stVal, 1) = ";") then
+    stVal = Mid(stVal, 2)
+end if
+if (Right(stVal, 1) = ";") then
+    stVal = Mid(stVal, 1, Len(stVal) - 1)
+end if
+
+tarr = Split(Trim(stVal), ";")
+for i = 0 to UBound(tarr, 1)
+    set opt = document.createElement("option")
+    styleSelect.options.add(opt)
+    'opt parameetrid peavad peale lisamist tulema
+    opt.innerText = Trim(tarr(i))
+    opt.id = Trim(tarr(i))
+next
+
+End Sub 'enbdyOnClick
+
+
+'-----------------------------------------------------------------------------------
+Function bodyOnKeyUp()
+if (window.event.keyCode = 27) then
+	window.close()
+elseif (window.event.keyCode = 13) then
+	SetReturnV()
+end if
+End Function 'bodyOnKeyUp
+
+
+'-----------------------------------------------------------------------------------
+Function SetReturnV()
+itemAssign.click()
+window.returnValue = "OK:" & eNBdy.rows(0).cells(2).innerText
+window.close()
+End Function 'SetReturnV
+
+
+'-----------------------------------------------------------------------------------
+Sub styleSelectOnChange()
+Dim tarr, stItm, stVal
+tarr = Split(window.event.srcElement.options(window.event.srcElement.selectedIndex).innerText, ":")
+if (UBound(tarr, 1) = 1) then
+    set stItm = styleItem.options(Trim(tarr(0)))
+    if Not (stItm Is Nothing) then
+        stItm.selected = true
+    end if
+    set stVal = styleValue.options(Trim(tarr(1)))
+    if Not (stVal Is Nothing) then
+        stVal.selected = true
+    end if
+end if
+End Sub 'styleSelectOnChange
+
+
+'-----------------------------------------------------------------------------------
+Sub SetStyleValue()
+Dim cssId, cssValues, cssValue
+Dim opt
+'Dim optGrp
+
+if (window.event.propertyName = "selectedIndex") then
+    styleValue.innerHTML = ""
+    cssId = window.event.srcElement.options(window.event.srcElement.selectedIndex).id
+    if (cssId = "font-family") then
+        Call fillFonts()
+    elseif (Right(cssId, 5) = "color") then
+
+'        Dim sColor
+'        sColor = Hex(dlgHelper.ChooseColorDlg())
+'        if (Len(sColor) < 6) then
+'            sColor = Mid("000000", 1, 6-Len(sColor)) & sColor
+'        end if
+'        set opt = document.createElement("option")
+'        styleValue.options.add(opt)
+'        'opt parameetrid peavad peale lisamist tulema
+'        opt.innerText = "0x" & sColor
+'        opt.id = "#" & sColor
+'        opt.style.backgroundColor = sColor
+
+        if Not (cssDOM Is Nothing) then
+            set cssValues = cssDOM.documentElement.selectNodes("item[@id = 'background-color']/value")
+            for each cssValue in cssValues
+
+'                set optGrp = document.createElement("OPTGROUP")
+'                optGrp.label = cssValue.text
+'                set opt = document.createElement("option")
+'                opt.id = cssValue.text
+'                opt.style.backgroundColor = cssValue.text
+'                Call optGrp.appendChild(opt)
+'                Call styleValue.appendChild(optGrp)
+
+                set opt = document.createElement("option")
+                styleValue.options.add(opt)
+                'opt parameetrid peavad peale lisamist tulema
+                opt.innerText = cssValue.text
+                opt.id = cssValue.text
+                opt.style.backgroundColor = cssValue.text
+
+            next
+        end if
+
+    else
+        if Not (cssDOM Is Nothing) then
+            set cssValues = cssDOM.documentElement.selectNodes("item[@id = '" & cssId & "']/value")
+            for each cssValue in cssValues
+                set opt = document.createElement("option")
+                styleValue.options.add(opt)
+                'opt parameetrid peavad peale lisamist tulema
+                opt.innerText = cssValue.text
+                opt.id = cssValue.text
+            next
+        end if
+    end if
+end if
+End Sub 'SetStyleValue
+
+
+'-----------------------------------------------------------------------------------
+Sub assignStyle()
+if (styleSelect.selectedIndex > -1) then
+    if (styleItem.selectedIndex > 0 and styleValue.selectedIndex > -1) then
+        Dim stItmVal
+        stItmVal = styleItem.options(styleItem.selectedIndex).id & ":" & _
+            styleValue.options(styleValue.selectedIndex).id
+        styleSelect.options(styleSelect.selectedIndex).innerText = stItmVal
+        styleSelect.options(styleSelect.selectedIndex).id = stItmVal
+    end if
+end if
+End Sub 'assignStyle
+
+
+'-----------------------------------------------------------------------------------
+Sub addStyle()
+if (styleItem.selectedIndex > 0 and styleValue.selectedIndex > -1) then
+    Dim opt
+    set opt = document.createElement("option")
+    styleSelect.options.add(opt)
+    'opt parameetrid peavad peale lisamist tulema
+    Dim stItmVal
+    stItmVal = styleItem.options(styleItem.selectedIndex).id & ":" & styleValue.options(styleValue.selectedIndex).id
+    opt.innerText = stItmVal
+    opt.id = stItmVal
+end if
+End Sub 'addStyle
+
+
+'-----------------------------------------------------------------------------------
+Sub deleteStyle()
+if (styleSelect.selectedIndex > -1) then
+    Dim i
+    i = styleSelect.selectedIndex
+    styleSelect.options.remove(i)
+    if (styleSelect.options.length > 0) then
+        if (i = styleSelect.options.length) then
+            i = i - 1
+        end if
+        styleSelect.options(i).selected = true
+    end if
+end if
+End Sub 'deleteStyle
+
+
+'-----------------------------------------------------------------------------------
+Sub assignItem()
+if Not IsEmpty(crI) then
+    Dim styleSelectVal, opt
+    if (styleSelect.options.length > 0) then
+        for each opt in styleSelect.options
+            styleSelectVal = styleSelectVal & opt.id & ";"
+        next
+    else
+        styleSelectVal = ""
+    end if
+    eNBdy.rows(crI).cells(2).innerText = styleSelectVal
+    Call setCurrentCSS(styleSelectVal)
+end if
+End Sub 'assignItem
+
+
+'-----------------------------------------------------------------------------------
+Sub deleteItem()
+if Not IsEmpty(crI) then
+    eNBdy.rows(crI).cells(2).innerText = ""
+    Call setCurrentCSS("")
+end if
+End Sub 'deleteItem
+
+
+-->
+    </script>
+
+
+    <script language=jscript type="text/jscript">
+<!--
+
+
+function fillFonts() {
+    var charSets = new Array();
+    for (i = 0; i < 256; i++) {
+        charSets.push('');
+    }
+    // 95 and later
+    charSets[0] = 'ANSI';
+    charSets[1] = 'DEFAULT';
+    charSets[2] = 'SYMBOL';
+    charSets[128] = 'SHIFTJIS';
+    charSets[129] = 'HANGUL';
+    charSets[134] = 'GB2312';
+    charSets[136] = 'CHINESEBIG5';
+    charSets[255] = 'OEM';
+    // NT4 and later
+    charSets[77] = 'MAC';
+    charSets[130] = 'JOHAB';
+    charSets[161] = 'GREEK';
+    charSets[162] = 'TURKISH';
+    charSets[163] = 'VIETNAMESE';
+    charSets[177] = 'HEBREW';
+    charSets[178] = 'ARABIC';
+    charSets[186] = 'BALTIC';
+    charSets[204] = 'RUSSIAN';
+    charSets[222] = 'THAI';
+    charSets[238] = 'EASTEUROPE';
+    
+    var fontsArray = new Array();
+    var i;
+    for (i = 1; i <= dlgHelper.fonts.count; i++) {
+        fontsArray.push(dlgHelper.fonts(i));
+    }
+    fontsArray.sort();
+    
+    var opt, chSet;
+    for (i = 0; i < fontsArray.length; i++) {
+        opt = document.createElement("option");
+        styleValue.options.add(opt);
+        //opt parameetrid peavad peale lisamist tulema
+        chSet = charSets[dlgHelper.getCharset(fontsArray[i])];
+        opt.innerText = "'" + fontsArray[i] + "' - " + chSet + " chs";
+        opt.id = "'" + fontsArray[i] + "'";
+    }
+    return;
+}
+
+
+-->
+    </script>
+</head>
+<body style="background-color:buttonface" onload="bodyOnLoad()" onkeyup="bodyOnKeyUp()">
+	<div id="sisu" style="padding-top:5mm;width:100%">
+	    <table id="sisuTabel" style="width:100%" border="1">
+	        <tr>
+	            <td id="elemNames" style="width:45%" valign="top">
+	                <table id="elemNamesTable" style="width:100%" border="1">
+	                    <thead>
+	                        <tr style="background-color:Navy;color:White;">
+	                            <th id="th_itm"></th>
+	                            <th id="th_itmName"></th>
+	                            <th id="th_itmVal"></th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="eNBdy" onclick="enbdyOnClick()">
+	                        <tr>
+	                            <td id="td_itm" style="font-weight:bold"></td>
+	                            <td id="td_itmName" style="font-weight:bold"></td>
+	                            <td id="td_itmVal"></td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+	                <br />
+	                <br />
+	                <br />
+	                <br />
+	                <table id="naited" style="width:100%" border="1">
+	                    <caption id="naitedCaption"></caption>
+	                    <tr>
+	                        <td><span id="hng"></span></td>
+	                        <td><span id="itxt"></span></td>
+	                        <td><span id="att"></span></td>
+	                        <td><span id="txt"></span></td>
+	                    </tr>
+	                    <tr>
+	                        <td colspan="4"><span id="cmt"></span></td>
+	                    </tr>
+	                </table>
+	            </td>
+	            <td id="elemValues" style="width:55%" valign="top">
+	                <table id="elemValuesTable" style="width:100%">
+	                    <tr valign="top">
+	                        <td style="width:10%">
+	                            <label for="styleSelect" id="styleSelectLabel" style="font-size:x-small"></label>
+	                        </td>
+	                        <td style="width:30%">
+                                <select id="styleSelect" size="14" style="width:100%" onchange="styleSelectOnChange()"></select>
+	                        </td>
+	                        <td style="width:60%">
+                                <select id="styleItem" style="width:100%" onpropertychange="SetStyleValue()"></select>
+                                <select id="styleValue" style="width:100%"></select>
+	                        </td>
+	                        <td style="width:16px">
+	                            <img id="styleAssign" src="../graphics/arith03e_equal.ico" style="width:16px" onclick="assignStyle()" />
+	                            <img id="styleAdd" src="../graphics/arith03c_plus.ico" style="width:16px" onclick="addStyle()" />
+                                <img id="styleDelete" src="../graphics/delart 16-16.ico" style="width:16px" onclick="deleteStyle()" />
+	                        </td>
+	                    </tr>
+	                </table>
+	            </td>
+	        </tr>
+	        <tr>
+	            <td align="right">
+                    <img id="itemDelete" src="../graphics/delart 16-16.ico" style="width:16px" onclick="deleteItem()" />
+	            </td>
+	            <td align="right">
+                    <img id="itemAssign" src="../graphics/arith03e_equal.ico" style="width:16px" onclick="assignItem()" />
+	            </td>
+	        </tr>
+	        <tr>
+	            <td colspan="2" align="right">
+	                <input id="confAssign" type="button" value="OK" onclick="SetReturnV()" style="width:4cm" />
+	            </td>
+	        </tr>
+	    </table>
+    </div>
+    <div id="langConst" style="display:none;">
+        <div id="langConst_et">
+            var STYLE_TEXT = "Stiil";
+            var HEADING_TEXT = "Pealkiri";
+            var TEXT_TEXT = "Tekst";
+            var ITM_TEXT = "Stiili tüüp";
+            var ITM_NAME_TEXT = "Nimetus";
+            var ITM_VAL_TEXT = "Väärtus";
+            var ITM_CPT_TEXT = "Stiili näide";
+            var ITM_HNG_TEXT = "nimi";
+            var ITM_INFO_TEXT = "info";
+            var ITM_ATTR_TEXT = "atr";
+            var ITM_TXT_TEXT = "tekst";
+            var ITM_CMT_TEXT = "kommentaar";
+        </div>
+        <div id="langConst_en">
+            var STYLE_TEXT = "Style";
+            var HEADING_TEXT = "Heading";
+            var TEXT_TEXT = "Text";
+            var ITM_TEXT = "Style type";
+            var ITM_NAME_TEXT = "Name";
+            var ITM_VAL_TEXT = "Value";
+            var ITM_CPT_TEXT = "Style example";
+            var ITM_HNG_TEXT = "name";
+            var ITM_INFO_TEXT = "info";
+            var ITM_ATTR_TEXT = "atr";
+            var ITM_TXT_TEXT = "text";
+            var ITM_CMT_TEXT = "comment";
+        </div>
+    </div>
+    <object id=dlgHelper classid="clsid:3050f819-98b5-11cf-bb82-00aa00bdce0b" width="0px" height="0px"></object>
+    <object
+        id="procs"
+        style="display:none"
+        type="text/x-scriptlet"
+        data="procs_sct.htm">
+    </object>
+</body>
+</html>

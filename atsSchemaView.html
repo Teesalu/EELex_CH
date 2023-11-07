@@ -1,0 +1,493 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <title>Sõnastikud</title>
+    <iframe src="https://ghbtns.com/github-btn.html?user=niutech&amp;repo=showModalDialog&amp;type=watch&amp;count=true"
+        height="30" width="118" frameborder="0" allowTransparency="true"></iframe>
+    <!--ühine-->
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcommon.js"></script>
+    <!--layout-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/skins/dhtmlxlayout_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcontainer.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.js"></script>
+    <!--toolbar-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxToolbar/codebase/skins/dhtmlxtoolbar_dhx_web.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxToolbar/codebase/dhtmlxtoolbar.js"></script>
+    <!--menu-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxMenu/codebase/skins/dhtmlxmenu_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/dhtmlxmenu.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/ext/dhtmlxmenu_ext.js"></script>
+    <!--grid-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid_skins.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/skins/dhtmlxgrid_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_filter.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+    <!--windows-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/skins/dhtmlxwindows_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxcontainer.js"></script>
+    <!--EELex-->
+    <link rel="stylesheet" type="text/css" href="../css/script.css">
+    <script type="text/javascript" src="tools_dx.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+    <style>
+        .grid_hover {
+            background-color: #7FFFD4;
+            font-size: 20px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        PD = "\uE001";
+        var cPtd, cKoopia, cVaategen, cSkeemigen, cHulgi, cLoendid, cImport;
+        var dic_desc, usrName, rezm;
+
+        var aArray1 = [];
+        var aArray2 = [];
+        var aArray3 = [];
+
+
+        /**
+        * ATS5 bodyOnLoad
+        * @method bodyOnLoad()
+        */
+        function bodyOnLoad() {
+
+            //window.alert("OK!");
+            var inArr = parent.cDialogArg.split(PD);
+
+            dic_desc = inArr[0];
+            usrName = inArr[1];
+            cDpr = inArr[2];
+
+            //document.getElementById("id_body").innerHTML = "<input id='update' name='update' onclick='UpdateClick()' type='button' value=' OK ' tabindex='1'>";
+
+            // Loetakse massiividesse skeemi elemendid
+            atsSchemaInit(cDpr);
+
+            // Gridi häälestus
+            var layoutParent = document.getElementById("parentId");
+            var cPealkiri = parent.cTxtz;
+            dhxLayoutContent = new dhtmlXLayoutObject(layoutParent, "1C", "dhx_blue");
+            dhxLayoutContent.cells("a").setText(cPealkiri);
+            brGrid = dhxLayoutContent.cells("a").attachGrid();
+            brGrid.setImagePath("dhtmlx/dhtmlxGrid/codebase/imgs/");
+            brGrid.setHeader("Nr,Kirjeldav nimi,Täisnimi,Korduvus");
+            brGrid.attachHeader("&nbsp;,#text_search,#text_search,&nbsp");
+            //brGrid.attachHeader("&nbsp;,#text_search,#text_search,#select_filter,#text_search");
+            brGrid.setInitWidths("30,200,400,80");
+            brGrid.setColAlign("center,left,left,center");
+            brGrid.enableEditEvents(false, false, false, false); // click, dblclick, F2
+            //brGrid.setColSorting("int,str,str");
+            //brGrid.sortRows("2, str, des");
+            brGrid.setColTypes("ro,ro,ro,ro");
+            //brGrid.enableTooltips("false,false,false");
+            brGrid.setSkin("dhx_skyblue");
+            brGrid.enableRowsHover(true, 'grid_hover')
+            brGrid.enableLightMouseNavigation(false)
+            brGrid.enableAutoHeight(false, dhxLayoutContent.cells("a").getHeight() - 50, true);
+            //    brGrid.attachHeader(" ,#cspan,#text_search,#text_filter,#combo_filter,#text_filter,#combo_filter,#text_filter,#text_filter,#combo_filter");
+            //    // setStyle(ss_header, ss_grid, ss_selCell, ss_selRow)
+            //    brGrid.setStyle("background-color:navy;color:white; font-weight:bold;", "", "color:red;", "");
+            //    brGrid.setStyle("", "", "", "background-color:silver;");
+            //brGrid.attachEvent("onRowClicked", ValinClick);
+            brGrid.attachEvent("onRowSelect", doOnRowSelected);
+            brGrid.init();
+            brGrid.enableSmartRendering(true);
+            //brGrid.makeSearch("AES 1928", 1);
+            brGrid.attachEvent("onRowSelect", function (id, ind) {
+
+                cValElement = brGrid.cells(brGrid.getSelectedId(), 1).getValue();
+                //parent.atOtsing(cValElement)
+                //parent.dhxWins.window("histview").close();
+
+            });
+
+            brGrid.attachEvent("onclick", function (id, ind) {
+                parent.dhxWins.window("duser").close();
+                //gridOnRightClick(id, ind, obj);
+                gridOnRowSelect(id, ind);
+            });
+
+            FillBrowseFrame();
+        }
+
+        function doOnRowSelected(id) {
+            //window.alert("Rows with id: " + id + " was selected by user");
+            cValElement = brGrid.cells(brGrid.getSelectedId(), 1).getValue();
+
+        }
+
+        /**
+        * ATS5 FillBrowseFrame
+        * @method FillBrowseFrame()
+        */
+        function FillBrowseFrame() {
+
+            brGrid.clearAll();
+            var nRidu = aArray2.length;
+            //atsKontroll(nRidu);
+            var rowsXml = "<rows>";
+            for (ix = 0; ix < nRidu; ix++) {
+                rowsXml += "<row id='" + (ix + 1) + "'>";
+                rowsXml += "<userdata name='artKeys'>" + aArray2[ix] + "</userdata>";
+                rowsXml += "<cell>" + (ix + 1) + "</cell>";
+                rowsXml += "<cell>" + aArray1[ix] + "</cell>";
+                rowsXml += "<cell>" + aArray2[ix] + "</cell>";
+                rowsXml += "<cell>" + aArray3[ix] + "</cell>";
+                rowsXml += "</row>";
+            }
+            rowsXml += "</rows>";
+            brGrid.parse(rowsXml);
+        } //FillBrowseFrame
+
+
+        /**
+        * Kui rida on valitud
+        * 
+        * @method fillIfrTable
+        * @param {objekt} rowId, colInd
+        */
+        function gridOnRowSelect(rowId, colInd) {
+            var cRowID = brGrid.getRowId(brGrid.getRowIndex(brGrid.getSelectedId()))
+            window.alert(cRowID);
+        } // gridOnRowSelect
+
+
+
+        /**
+        * Rea andmete lugemine
+        * 
+        * @method doBrowseRead
+        * @param {objekt} rowId, colInd
+        */
+        function doBrowseRead(rowId, colInd) {
+
+            brGrid.getRowId(brGrid.getRowIndex(brGrid.getSelectedId()))
+            var userdata = brGrid.getUserData(rowId, "artKeys");
+            //window.alert(rowId + "  " + userdata);
+            var RetData = "";
+            //var zRet = atModalW(rowId,aArray_Code[rowId-1],aArray_Name[rowId-1]);
+            //RetData = window.prompt("Palun muutke nimetust:",userdata);
+
+            if (RetData == null || RetData == "") {
+            } else {
+                aArray_Name[rowId - 1] = RetData;
+                FillBrowseFrame();
+            }
+
+        } // doBrowseRead
+
+
+
+        /**
+        * Väljub html-st
+        * 
+        * @method ValinClick
+        */
+        function ValinClick() {
+            //window.alert(cValElement);
+            if (cValElement == "") {
+                var dRet = window.confirm("Te ei valinud märksõna. Kas soovite uuesti proovida?");
+                if (dRet == false) {
+                    parent.dhxWins.window("histview").close();
+                }
+            } else {
+                parent.atLoendReturn(cValElement);
+                parent.dhxWins.window("histview").close();
+            }
+        } //ValinClick
+
+
+
+        /**
+          *  Teeb XML prefiksist nimeruumi URI.
+          * 
+          * @method NSResolver
+          * @param {String} nsPrefix
+          */
+        function NSResolver(nsPrefix) {
+            if (nsPrefix == DICPR) {
+                return DICURI;
+            } else if (nsPrefix == SDPR) {
+                return SDURI;
+            } else if (nsPrefix == NS_XS_PR) {
+                return NS_XS;
+            } else if (nsPrefix == "xml") {
+                return NS_XML;
+            } else if (nsPrefix == NS_XSL_PR) {
+                return NS_XSL;
+            }
+            return null;
+        }
+
+        /**
+         * Uuendab pildi
+         * 
+         * @method UpdateClick
+         */
+        function UpdateClick() {
+            parent.dhxWins.window("schem").close();
+
+        } //UpdateClick       
+
+        /**
+        * atslib_dx - Skeemi kuvamise andmete ettevalmistamine
+        * 
+        * @method atsSchemaInit
+        * @param  cDpr = x,h jne.
+        */
+        function atsSchemaInit(cDpr) {
+
+            //window.alert("Starty 10.05.2023 ...");
+
+
+            var DPR = cDpr;
+            var cMakett1 = "#" + DPR + ":";
+
+            var yStruDom = IDD("File", "../xml/" + dic_desc + "/stru_" + dic_desc + ".xml", false, false, null);
+            if (!yStruDom) {
+                alert("Skeemi ja toimetamisala genereerimine tegemata!");
+                return;
+            }
+            // The normalize method joins adjacent text nodes into a single text node and removes empty text nodes. 
+            // Note: in Internet Explorer, the normalize method does not remove empty text nodes.
+            yStruDom.normalize;
+
+            var cStringa = "_______________________________________________________________________________________________________"
+            var cTxt = getXmlString(yStruDom);
+            cTxt = cTxt.replace(/pr_sd:it/g, "|pr_sd:it");
+
+            if (DPR == "x") {
+                cTxt = cTxt.replace(/<x:/g, cMakett1);
+            } else if (DPR == "h") {
+                cTxt = cTxt.replace(/<h:/g, cMakett1);
+            } else if (DPR == "s") {
+                cTxt = cTxt.replace(/<s:/g, cMakett1);
+            } else if (DPR == "k") {
+                cTxt = cTxt.replace(/<k:/g, cMakett1);
+            } else if (DPR == "m") {
+                cTxt = cTxt.replace(/<m:/g, cMakett1);
+            } else if (DPR == "n") {
+                cTxt = cTxt.replace(/<n:/g, cMakett1);
+            } else if (DPR == "g") {
+                cTxt = cTxt.replace(/<g:/g, cMakett1);
+            } else if (DPR == "c") {
+                cTxt = cTxt.replace(/<c:/g, cMakett1);
+            }
+
+
+            cTxt = cTxt.replace(/>/g, ">|");
+
+            var cOperText = "";
+            var aArray_Code = [];
+            var aArray_Name = [];
+            var aArray_Tab = [];
+            var aArray_Attr = [];
+            var aArray_Min = [];
+            var aArray_Max = [];
+            var nRet;
+            var cMRow;
+
+            var aSplitArray = cTxt.split("|");
+            var nLen = aSplitArray.length;
+
+            for (iz = 2; iz < nLen; iz++) {
+
+                nRet = aSplitArray[iz].indexOf(cMakett1);
+
+                if (nRet > 0) {
+
+                    var cTabs = nRet - 1;
+                    var aRowArray = aSplitArray[iz].split("#");
+                    cOperText = aRowArray[1];
+                    aArray_Code.push(cOperText.trim());
+                    aArray_Name.push("");
+                    aArray_Tab.push(cTabs);
+                    aArray_Attr.push("");
+                    aArray_Min.push("");
+                    aArray_Max.push("");
+                }
+
+            }
+
+            nLen = aArray_Code.length;
+            for (iz = 0; iz < nLen; iz++) {
+
+                var vvv = aArray_Code[iz];
+                var sss = aArray_Tab[iz];
+                var cATex = "";
+                for (ib = 0; ib < sss; ib++) {
+                    cATex = cATex + "| ";
+                }
+                aArray_Tab[iz] = cATex
+
+                var cElemNamm = atsFindAttributes(vvv, yStruDom);
+                cElemNamm = vvv + "|" + cElemNamm;
+                var aSplitArraz = cElemNamm.split("|");
+
+                var nLngt = aSplitArraz.length;
+
+                var cTTex = "";
+                var cRTex = "";
+                for (ib = 0; ib < nLngt; ib++) {
+
+                    // Tühjadesse elementidesse lisatakse #
+                    if (aSplitArraz[ib] == "") {
+                        aSplitArraz[ib] = "#";
+                    }
+                    // Välja nimetusest eraldatakse eestikeelne osa
+                    if (ib == 4) {
+                        var aArray = aSplitArraz[ib].split(";");
+                        aArray_Name[iz] = aArray[0];
+                        aSplitArraz[ib] = aArray[0];
+                    }
+                    // Antud välja min arv
+                    if (ib == 5) {
+                        aArray_Min[iz] = aSplitArraz[ib];
+                    }
+                    // Antud välja max arv
+                    if (ib == 6) {
+                        if (aSplitArraz[ib] == "2000000000") {
+                            aSplitArraz[ib] = "∞";
+                        }
+                        aArray_Max[iz] = aSplitArraz[ib];
+                    }
+                    // Antud välja atribuudid
+                    if (nLngt > 8) {
+                        if (ib > 7) {
+                            if (aSplitArraz[ib].indexOf(DPR + ":") > -1) {
+                                aSplitArraz[ib] = "@" + aSplitArraz[ib];
+                                cRTex = cRTex + aSplitArraz[ib] + " ";
+                            }
+                            if (aSplitArraz[ib].indexOf( "xml:") > -1) {
+                                aSplitArraz[ib] = "@" + aSplitArraz[ib];
+                                cRTex = cRTex + aSplitArraz[ib] + " ";
+                            }
+
+                        }
+                    }
+                    cTTex = cTTex + aSplitArraz[ib] + " ";
+                }
+                // Antud välja atribuudid aArray_Attr
+                aArray_Attr[iz] = cRTex;
+
+
+                if (iz < 5) {
+
+                    //window.alert(aArray_Name[iz] + " " + aArray_Tab[iz] + " " + aArray_Code[iz] + " " + aArray_Attr[iz] + " " + aArray_Min[iz] + " " + aArray_Max[iz]);
+
+                }
+
+                var cTKT = "";
+                // veerg 1
+                aArray1.push(aArray_Name[iz]);
+
+                // veerg 2
+                cTXT = aArray_Tab[iz];
+                cTXT = cTXT + " " + aArray_Code[iz] + " " + aArray_Attr[iz];
+                aArray2.push(cTXT);
+
+                // veerg 3
+                cTXT = aArray_Min[iz] + "," + aArray_Max[iz];
+                aArray3.push(cTXT);
+            }
+            return;
+        }
+
+        /**
+        * atslib_dx - Elemendi ehk välja nimetuse ja atribuutide leidmine.
+        * 
+        * @method atsFindAttributes
+        * @param  zOtsElem = elemendi ehk välja nimi (näiteks x:m)
+        * @param  zStrucDom = struktuuri faili DOM
+        */
+        function atsFindAttributes(zOtsElem, zStrucDom) {
+            var cAttriName, cRetValue, cAttrValue, cIt, cCt, cTn, cNimi, cMinOcc, cMaxOcc, cMajor;
+
+            // Leiame elemendi...
+            var cElemDom = zStrucDom.getElementsByTagName(zOtsElem);
+
+            // Leiame atribuutide arvu
+            var nAttrCount = cElemDom.item(0).attributes.length;
+
+
+            cRetValue = "";
+            // Leiame atribuutide väärtused
+            for (var k = 0; k < nAttrCount; k++) {
+                cAttrValue = "";
+                cAttriName = cElemDom.item(0).attributes[k].name;
+                if (cAttriName.indexOf("pr_sd:it") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:ct") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:tn") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:nimi") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:minOcc") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:maxOcc") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:major") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                } else if (cAttriName.indexOf("pr_sd:") == -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].name;
+                } else if (cAttriName.indexOf("pr_sd:att_x_") > -1) {
+                    cAttrValue = cElemDom.item(0).attributes[k].value;
+                }
+
+                if (cRetValue == "") {
+                    cRetValue = cAttrValue;
+                } else {
+                    cRetValue = cRetValue + "|" + cAttrValue;
+                }
+
+            }
+            return (cRetValue)
+        }
+
+
+
+
+
+
+    </script>
+
+    <!--css-->
+    <style>
+        .myDiv {
+            text-align: center;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: auto;
+            background-color: #ececec;
+        }
+    </style>
+</head>
+
+<body onload="bodyOnLoad()">
+    <div id="parentId" style="width:100%;height:90%;">
+    </div>
+    <div class="myDiv" id='id_body'>
+    </div>
+</body>
+
+</html>

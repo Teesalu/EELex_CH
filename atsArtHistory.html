@@ -1,0 +1,234 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <title>Sõnastikud</title>
+    <iframe src="https://ghbtns.com/github-btn.html?user=niutech&amp;repo=showModalDialog&amp;type=watch&amp;count=true"
+        height="30" width="118" frameborder="0" allowTransparency="true"></iframe>
+    <!--ühine-->
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcommon.js"></script>
+    <!--layout-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/skins/dhtmlxlayout_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcontainer.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.js"></script>
+    <!--toolbar-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxToolbar/codebase/skins/dhtmlxtoolbar_dhx_web.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxToolbar/codebase/dhtmlxtoolbar.js"></script>
+    <!--menu-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxMenu/codebase/skins/dhtmlxmenu_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/dhtmlxmenu.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/ext/dhtmlxmenu_ext.js"></script>
+    <!--grid-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid_skins.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/skins/dhtmlxgrid_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_filter.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+    <!--windows-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/skins/dhtmlxwindows_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxcontainer.js"></script>
+    <!--EELex-->
+    <link rel="stylesheet" type="text/css" href="../css/script.css">
+    <style>
+        .grid_hover {
+            background-color: #7FFFD4;
+            font-size: 20px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        PD = "\uE001";
+
+        /**
+        * ATS5 bodyOnLoad
+        * @method bodyOnLoad()
+        */
+        function bodyOnLoad() {
+            var ix;
+
+            var layoutParent = document.getElementById("parentId");
+            var cPealkiri = parent.cTxtz;
+            dhxLayoutContent = new dhtmlXLayoutObject(layoutParent, "1C", "dhx_blue");
+            dhxLayoutContent.cells("a").setText(cPealkiri);
+            brGrid = dhxLayoutContent.cells("a").attachGrid();
+            brGrid.setImagePath("dhtmlx/dhtmlxGrid/codebase/imgs/");
+            brGrid.setHeader("Nr,Märksõna,Aeg");
+            brGrid.attachHeader("&nbsp;,#text_search,&nbsp");
+            brGrid.setInitWidths("50,200,150");
+            brGrid.setColAlign("center,left,left");
+            brGrid.enableEditEvents(true, true, false); // click, dblclick, F2
+            brGrid.setColSorting("int,str,str");
+            brGrid.sortRows("2, str, des");
+            brGrid.setColTypes("ro,ro,ro");
+            brGrid.enableTooltips("false,false,false");
+            brGrid.setSkin("dhx_skyblue");
+            brGrid.enableRowsHover(true, 'grid_hover')
+            brGrid.enableLightMouseNavigation(false)
+            brGrid.enableAutoHeight(false, dhxLayoutContent.cells("a").getHeight() - 50, true);
+            //    brGrid.attachHeader(" ,#cspan,#text_search,#text_filter,#combo_filter,#text_filter,#combo_filter,#text_filter,#text_filter,#combo_filter");
+            //    // setStyle(ss_header, ss_grid, ss_selCell, ss_selRow)
+            //    brGrid.setStyle("background-color:navy;color:white; font-weight:bold;", "", "color:red;", "");
+            //    brGrid.setStyle("", "", "", "background-color:silver;");
+            //brGrid.attachEvent("onRowClicked", ValinClick);
+            brGrid.attachEvent("onRowSelect", doOnRowSelected);
+            brGrid.init();
+            brGrid.enableSmartRendering(true);
+            brGrid.makeSearch("AES 1928", 1);
+            brGrid.attachEvent("onRowSelect", function (id, ind) {
+
+                cValElement = brGrid.cells(brGrid.getSelectedId(), 1).getValue();
+                parent.atOtsing(cValElement)
+                //parent.dhxWins.window("histview").close();
+
+            });
+
+            brGrid.attachEvent("onclick", function (id, ind) {
+                parent.dhxWins.window("histview").close();
+                //gridOnRightClick(id, ind, obj);
+                gridOnRowSelect(id, ind);
+            });
+
+            FillBrowseFrame();
+        }
+
+        function doOnRowSelected(id) {
+            //window.alert("Rows with id: " + id + " was selected by user");
+            cValElement = brGrid.cells(brGrid.getSelectedId(), 1).getValue();
+
+        }
+
+        /**
+        * ATS5 FillBrowseFrame
+        * @method FillBrowseFrame()
+        */
+        function FillBrowseFrame() {
+
+            brGrid.clearAll();
+            var nRidu = parent.aArray_History.length;
+            //atsKontroll(nRidu);
+            var rowsXml = "<rows>";
+            for (ix = 0; ix < nRidu; ix++) {
+                var aSplitArray = parent.aArray_History[ix].split(PD);
+                rowsXml += "<row id='" + (ix + 1) + "'>";
+                rowsXml += "<userdata name='artKeys'>" + aSplitArray[0] + "</userdata>";
+                rowsXml += "<cell>" + (ix + 1) + "</cell>";
+                rowsXml += "<cell>" + aSplitArray[0] + "</cell>";
+                rowsXml += "<cell>" + aSplitArray[1] + "</cell>";
+                rowsXml += "</row>";
+            }
+            rowsXml += "</rows>";
+            brGrid.parse(rowsXml);
+        } //FillBrowseFrame
+
+
+        /**
+        * Kui rida on valitud
+        * 
+        * @method fillIfrTable
+        * @param {objekt} rowId, colInd
+        */
+        function gridOnRowSelect(rowId, colInd) {
+            var cRowID = brGrid.getRowId(brGrid.getRowIndex(brGrid.getSelectedId()))
+            window.alert(cRowID);
+
+            //doBrowseRead(rowId, colInd);
+        } // gridOnRowSelect
+
+        /**
+        * Rea andmete lugemine
+        * 
+        * @method doBrowseRead
+        * @param {objekt} rowId, colInd
+        */
+        function doBrowseRead(rowId, colInd) {
+
+            brGrid.getRowId(brGrid.getRowIndex(brGrid.getSelectedId()))
+            var userdata = brGrid.getUserData(rowId, "artKeys");
+            //window.alert(rowId + "  " + userdata);
+            var RetData = "";
+            //var zRet = atModalW(rowId,aArray_Code[rowId-1],aArray_Name[rowId-1]);
+            //RetData = window.prompt("Palun muutke nimetust:",userdata);
+
+            if (RetData == null || RetData == "") {
+            } else {
+                aArray_Name[rowId - 1] = RetData;
+                FillBrowseFrame();
+            }
+
+        } // doBrowseRead
+
+        /**
+        * Väljub html-st
+        * 
+        * @method ValinClick
+        */
+        function ValinClick() {
+            //window.alert(cValElement);
+            if (cValElement == "") {
+                var dRet = window.confirm("Te ei valinud märksõna. Kas soovite uuesti proovida?");
+                if (dRet == false) {
+                    parent.dhxWins.window("histview").close();
+                }
+            } else {
+                parent.atLoendReturn(cValElement);
+                parent.dhxWins.window("histview").close();
+            }
+        } //ValinClick
+
+        /**
+         * Uuendab pildi
+         * 
+         * @method UpdateClick
+         */
+        function UpdateClick() {
+            FillBrowseFrame();
+        } //UpdateClick
+
+
+        /**
+        * ATS5 Kontroll kuvamine
+        * @method atsKontroll
+        * @param {String} ccOper 
+        */
+        function atsKontroll(ccOper) {
+            window.alert(ccOper);
+        }
+    </script>
+
+    <!--css-->
+    <style>
+        .myDiv {
+            text-align: center;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: auto;
+            background-color: #ececec;
+        }
+    </style>
+</head>
+
+<body onload="bodyOnLoad()">
+    <div id="parentId" style="width:100%;height:83%;">
+    </div>
+    <div class="myDiv" id='id_body'>
+        <input id="update" name="update" onclick="UpdateClick()" type="button" value="Uuenda" tabindex="1">
+    </div>
+</body>
+
+</html>

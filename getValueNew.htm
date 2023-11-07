@@ -1,0 +1,118 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta http-equiv="x-ua-compatible" content="IE=EmulateIE9" >
+		<title>Valik</title>
+
+    <script type="text/javascript" src="res_var.js"></script>
+    <script type="text/javascript" src="res_lang_et.js"></script>
+    <script type="text/javascript" src="tools.js"></script>
+    <script type="text/javascript" src="res_xml.js"></script>
+    <script type="text/javascript" src="procs_edt.js"></script>
+    <script type="text/javascript" src="kontrollid.js"></script>
+    <script type="text/javascript" src="komponendid.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+    <script type="text/javascript" src="ats_TextContMenu.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/script.css">
+    <script type="text/javascript">
+    function AktMen1(nX){
+       var cTagName
+       if (nX == 1){
+           cTagName = "inp_ElemText1"
+           } else {
+            cTagName = "inp_ElemText2"
+           }
+
+           var element = document.getElementById(cTagName);
+        
+       
+       if (element.addEventListener) {
+          element.addEventListener('contextmenu', function() {
+
+            alert("You've tried to open context menu(uus)  :"); //here you draw your own menu
+            preventDefault();
+          }, false);
+        } else {
+          if (nX == 1){
+            element.attachEvent('oncontextmenu', function() {
+            atHandleWindowContextClick();
+            window.event.returnValue = false;
+            });
+           } else {
+            element.attachEvent('oncontextmenu', function() {
+            atHandleWindowContextMoreClick();
+            window.event.returnValue = false;
+            });
+           }
+        }
+      }
+    </script>
+		<script language=vbscript type="text/vbscript">
+		<!--
+
+Option Explicit
+
+'-----------------------------------------------------------------------------------
+Sub bodyOnLoad()
+Dim inArr
+
+call FillInsertSymbolsMenu
+call AktMen1(1)
+call AktMen1(2)
+End Sub 'bodyOnLoad
+
+		
+'-----------------------------------------------------------------------------------
+Function bodyOnKeyUp()
+if (window.event.keyCode = 27) then
+	window.close()
+elseif (window.event.keyCode = 13) then
+	SetReturnV()
+end if
+End Function 'bodyOnKeyUp
+
+
+'-----------------------------------------------------------------------------------
+Sub SetReturnV()
+Dim t,aaRet
+aaRet = Array("", "")
+
+aaRet(0)=inp_ElemText1.innerText
+aaRet(1)=inp_ElemText2.innerText
+'t = inp_ElemText1.innerText
+window.returnValue = aaRet
+window.close()
+End Sub 'SetReturnV
+
+			-->
+		</script>
+
+
+	</head>
+	<body  style="background-color:buttonface" onload="bodyOnLoad()" onkeyup="bodyOnKeyUp()">
+		<div id="idBody" style="padding:5mm 10mm 5mm 10mm;">
+		    <div id="divTekst" style="height:10%;">
+				<label for="tekst"><b>Sisesta uus väärtus:</b></label>
+				<br />
+				<TEXTAREA id="inp_ElemText1" name="tekst1" style="width:100%;" rows="1"></TEXTAREA>
+		    </div>
+		    <div id="divTekst" style="height:90%;">
+				<label for="tekst"><b>Sisesta EESTI - keelne seletus:</b></label>
+				<br />
+				<TEXTAREA id="inp_ElemText2" name="tekst2" style="width:100%;" rows="12"></TEXTAREA>
+		    </div>
+		    <div id="idButtons" align="left">
+			    <input id="btnOk" onclick="SetReturnV()" type="button" value="   OK   ">
+			    <input id="btnCancel" onclick="window.close()" type="button" value=" Loobu ">
+		    </div>
+		</div>
+
+<div id="tn_cmenu" style="display:none; position:absolute; width:300px;
+background-color:menu; border:outset 3px gray"
+onmouseover="SwitchCMenu()" onmouseout="SwitchCMenu()"
+onclick="ClickTNCMenu()" oncontextmenu="DisableContextMenu()"
+onlosecapture="HideDivMenu()">
+</div>
+
+	</body>
+</html>

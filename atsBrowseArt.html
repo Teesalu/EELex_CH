@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Browse Art</title>
+
+  <script type="text/javascript">
+    var PD = "\uE001";
+    var inArg = parent.cDialogArg;
+    var aSplitArray = inArg.split(PD);
+
+    var dic_desc = aSplitArray[0];
+    var cHtm = aSplitArray[1];
+    
+    var cNewHtml = xslJavaScript(cHtm);
+    //window.alert(dic_desc);
+    window.document.write(cNewHtml);
+
+    /**
+    * Korrigeerib prindi faili.
+    * 
+    * @method xslJavaScript
+    * @param {Object} cHTML
+    */
+    function xslJavaScript(cHTML) {
+
+
+      var xcss = "../css/gendView_" + dic_desc + ".css";
+      var cElem1 = "<head><link id='valaCss' rel='stylesheet' type='text/css' href='" + xcss + "' />";
+      cHTML = cHTML.replace(/<head>/g, cElem1);
+
+      // koristame tühiku erinevate avatavate sulgude tagant
+      cHTML = cHTML.replace(/&lt; /g, "<");
+      cHTML = cHTML.replace(/\[ /g, "[");
+      cHTML = cHTML.replace(/\( /g, "(");
+      cHTML = cHTML.replace(/\{ /g, "{");
+
+   // Muudatus 230508 AT
+   if (dic_desc == "pns") {
+        cHTML = cHTML.replace(/\>\. /g, ">.");
+    }
+     // Muudatus 230517 AT
+     if (dic_desc == "sas") {
+        cHTML = cHTML.replace(/\' /g, "'");
+    }
+
+
+      // ema -> eml (kursiiv)
+      cHTML = cHTML.replace(/(&amp;ema;(.+?)&amp;eml;)/g, "$2".italics());
+
+      // ba -> bl (bold)
+      cHTML = cHTML.replace(/(&amp;ba;(.+?)&amp;bl;)/g, "$2".bold());
+      // suba -> subl (alumine index)
+      cHTML = cHTML.replace(/(&amp;suba;(.+?)&amp;subl;)/g, "$2".sub());
+      // supa -> supl (alumine index)
+      cHTML = cHTML.replace(/(&amp;supa;(.+?)&amp;supl;)/g, "$2".sup());
+
+      cHTML = cHTML.replace(/(&amp;la;(.+?)&amp;ll;)/g, "&lt;u&gt;$2&lt;/u&gt;")
+
+      return cHTML;
+
+    } // xslJavaScript    
+
+  </script>
+
+</html>

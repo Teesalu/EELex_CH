@@ -1,0 +1,221 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <title>Sõnastikud</title>
+    <iframe src="https://ghbtns.com/github-btn.html?user=niutech&amp;repo=showModalDialog&amp;type=watch&amp;count=true"
+        height="30" width="118" frameborder="0" allowTransparency="true"></iframe>
+    <!--ühine-->
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcommon.js"></script>
+    <!--layout-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/skins/dhtmlxlayout_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcontainer.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.js"></script>
+    <!--toolbar-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxToolbar/codebase/skins/dhtmlxtoolbar_dhx_web.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxToolbar/codebase/dhtmlxtoolbar.js"></script>
+    <!--menu-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxMenu/codebase/skins/dhtmlxmenu_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/dhtmlxmenu.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/ext/dhtmlxmenu_ext.js"></script>
+    <!--grid-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid_skins.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_filter.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+    <!--windows-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/skins/dhtmlxwindows_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxcontainer.js"></script>
+    <!--EELex-->
+    <link rel="stylesheet" type="text/css" href="../css/script.css">
+    <script type="text/javascript" src="tools_dx.js"></script>
+    <script type="text/javascript" src="res_xml.js"></script>
+    <script type="text/javascript" src="komponendid_dx.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+    <script type="text/javascript" src="showModalDialog.js"></script>
+
+    <script type="text/javascript">
+        // Massiivid, kus hoitakse m ja i-d
+        var array_m = [];
+        var array_i = [];
+        // Tehtud valik
+        var cValik_m = "";
+        var cValik_i = "";
+        var cRetValueOk = "";
+
+
+
+
+        const ENUMVAL = 1;
+        const ET_COL = 2;
+        const EN_COL = 3;
+
+        const T_COL = 4;
+        const TA_COL = 5;
+
+        var dic_desc, sAppLang, sDestlang, PD, xsdFile, xsdType, usrName, docnDestColHead;
+        var idEnumsTable;
+        var idSeldRow, oRow;
+
+        var XsdDomText = " ";
+        var vaikimisi;
+        var enumValues;
+        var oDicXsdDOM;
+
+        var dUpdated;
+
+        const aArray_Code = [];
+        const aArray_Name = [];
+        const aArray_T = [];
+        const aArray_TA = [];
+        const aArray_OPT = [];
+        var nRowCount = 0;
+        var nRowID = 0;
+
+        dUpdated = false;
+        PD = "\uE001";
+
+        var inArg = window.dialogArguments;
+        //var aSplitArray = inArg.split(PD);
+        //window.alert(inArg);
+        //window.alert(aSplitArray[0]+ " * " + aSplitArray[1] + " * " + aSplitArray[2] + " * " + aSplitArray[3]);
+
+        //return;
+
+        //dic_desc = aSplitArray[0]; // vms
+        //var sVastus = aSplitArray[1]; // et
+        //var oOutDom = BuildXMLFromString(sVastus);
+        //alert ("??? " + sVastus);
+
+
+
+        var dhxTalaBar;
+
+
+        /**
+        * ATS5 bodyOnLoad
+        * @method bodyOnLoad()
+        */
+        function bodyOnLoad() {
+            var ix;
+            var barNr = 0;
+            //    window.dhx_globalImgPath = "html/dhtmlx/dhtmlxCombo/codebase/imgs/";
+
+            //var layoutParent = document.getElementById("parentId");
+            //    var layoutParent = document.body;
+
+
+
+            var cPealkiri = "Märgid, tähed ja sümbolid : ";
+            //dhxLayoutContent = new dhtmlXLayoutObject(layoutParent, "1C", "dhx_web");
+            //dhxLayoutContent.cells("a").setText(cPealkiri);
+ 
+ 
+            dhxLayout = new dhtmlXLayoutObject("parentId", "1C", "dhx_skyblue");
+    //dhxLayout = new dhtmlXLayoutObject("parentId", "1C", "dhx_web");
+    dhxLayout.cells("a").hideHeader();
+    //    dhxLayout.cont.obj._offsetTop = 10;
+    //    dhxLayout.cont.obj._offsetHeight = -60;
+    //dhxLayout.cells("a").setHeight(28);
+    //dhxLayout.cells("a").fixSize(true, true);
+ 
+    dhxBar = dhxLayout.cells("a").attachToolbar();
+    dhxBar.setSkin("dhx_web");
+    //dhxBar.cells("a").setText(cPealkiri);
+
+
+    //dhxBar.setSkin("dhx_blue");
+    dhxBar.setIconsPath("graphics/");
+ 
+ 
+ 
+ 
+            //dhxTalaBar = dhxLayoutContent.cells("a").attachToolbar();
+            //dhxTalaBar.setSkin("dhx_web");
+            //dhxTalaBar.setIconsPath("graphics/");
+            dhxBar.addText("dhxBarMenu3", ++barNr, "<div id='srMenu3'></div>");
+            var srMenuObj3 = document.getElementById("srMenu3");
+            var srMen3 = new dhtmlXMenuObject(srMenuObj3, "dhx_skyblue");
+            srMen3.setIconsPath("graphics/");
+            var menuXml3 =
+                "<menu>" +
+                "<item id='mnuSr3' text=' Valige märgid, tähed või sümbolid...' img='kirje 16-16.png'>" +
+                "<item id='mnu01' text='01. Muutujad ja kirjastiilid'/>" +
+                "<item id='mnu02' text='02. Ladina tähestik A - L'/>" +
+                "<item id='mnu03' text='03. Ladina tähestik M - Z'/>" +
+                "<item id='mnu04' text='04. Ligatuurid ja sümbolid'/>" +
+                "<item id='mnu05' text='05. Kreeka tähestik'/>" +
+                "<item id='mnu06' text='06. Vene tähestik'/>" +
+                "<item id='mnu07' text='07. Poolitusvihje'/>" +
+                "<item id='mnu08' text='08. Etüm. sümbolid'/>" +
+                "<item id='mnu09' text='09. Hääldusmärgid'/>" +
+                "</item>" +
+                "</menu>";
+            srMen3.loadXMLString(menuXml3);
+            srMen3.attachEvent("onClick", function (id, zoneId, casState) {
+                if (id != "sp1") {
+                    atsChoosSymb(id);
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //    dhxLayoutContent.cells("a").hideHeader();
+            //*
+            //dhxLayoutContent.cells("b").hideHeader();
+            //dhxLayoutContent.cells("b").setHeight(100);
+            //dhxLayoutContent.cells("b").fixSize(false, true);
+            //*
+            //    dhxLayoutContent.setAutoSize("a;b", "a");
+
+        }
+
+    </script>
+
+
+
+    <!--css-->
+    <style>
+        .myDiv {
+            text-align: center;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: auto;
+            background-color: #ececec;
+        }
+    </style>
+</head>
+
+<body onload="bodyOnLoad()">
+    <div id="parentId" style="width:100%;height:80%;">
+    </div>
+    <div class="myDiv" id='id_body'></div>
+</body>
+
+</html>

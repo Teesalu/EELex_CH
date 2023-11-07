@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=EmulateIE9">
+    <script type="text/javascript">
+     PD = "\uE001";
+     var dic_desc;
+     var inArg = window.dialogArguments;
+	 var aSplitArray = inArg.split(PD);
+ 
+     var cID = aSplitArray[0]; 
+	 var cCode = aSplitArray[1]; 
+     var cName = aSplitArray[2];
+
+
+     //window.alert(aArray_Name[cID - 1]);
+
+
+
+            //-----------------------------------------------------------------------------------
+        function Text1() {
+            var cTxt = "";
+            cTxt = cTxt + "<br /><br />";
+            cTxt = cTxt + "<label id='lblMs' for='ms' style='font-size: small'>Väärtus:</label><br />";
+            cTxt = cTxt + "<input id='ms' name='ms' type='text' size='40' tabindex='1' value='" + cCode + "' /><br /><br />";
+            cTxt = cTxt + "<label id='lblHomNr' for='homnr' style='font-size: small'>Seletus:</label><br />"; 
+            cTxt = cTxt + "<input id='homnr' name='homnr' type='text' size='40' tabindex='2' value='" + cName + "' /><br /><br />"; 
+            cTxt = cTxt + "<input id='loobu' name='loobu' onclick='LoobuClick()' type='button' value='Loobu' tabindex='4'>"; 
+            cTxt = cTxt + "<input id='muuda' name='muuda' onclick='MuudaClick()' type='button' value='Muuda' tabindex='5'>";
+            cTxt = cTxt + "<input id='lisa' name='lisa' onclick='LisaClick()' type='button' value='Lisa' tabindex='6'>"; 
+            cTxt = cTxt + "<input id='kustuta' name='kustuta' onclick='KustutaClick()' type='button' value='Kustuta' tabindex='7'>";
+            return(cTxt);
+        }
+
+         //-----------------------------------------------------------------------------------
+        function LisaLoad() {
+
+
+
+
+            document.getElementById("id_body").innerHTML = Text1();
+            window.returnValue = "*";
+        } //LisaLoad
+
+        //-----------------------------------------------------------------------------------
+        function HandleBodyKeyUp() {
+            var keyCode = ('which' in event) ? event.which : event.keyCode;
+            if (keyCode == 27) {
+                window.close();
+            } else if (keyCode == 13) {
+                SetReturnV();
+            }
+        } //HandleBodyKeyUp
+        //-----------------------------------------------------------------------------------
+        function LoobuClick() {
+            window.returnValue = "*";
+            var xBrs = WhatBrows();
+            if (xBrs == "Safari") {
+                 window.close();
+            }
+            else
+            {
+            //alert("OK");
+            parent.document.getElementsByTagName('dialog')[0].close();
+            }
+        } //LoobuClick
+
+        function WhatBrows() {
+            var retBrowser ="";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                retBrowser ='Opera';
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                retBrowser ='Chrome';
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                retBrowser ='Safari';
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                retBrowser ='Firefox';
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                retBrowser ='IE';
+            }
+            else {
+                retBrowser ='unknown';
+            }
+          return(retBrowser);
+        }
+        //-----------------------------------------------------------------------------------
+        function LisaClick() {
+            //alert("OK1");
+            SetReturnV();
+        } //LisaClick
+        //-----------------------------------------------------------------------------------
+        function SetReturnV() {
+            //var JR1 = "\uE001";
+            var JR1 = "#";
+            var msval = ms.value;
+            var homnrvalue = homnr.value;
+            var psVal = ps.value;
+            var whatbrw = "";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                whatbrw="Opera";
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                whatbrw="Chrome";
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                 whatbrw="Safari";
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                whatbrw="Firefox";
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                whatbrw="IE";
+            }
+            else {
+                whatbrw="unknown";
+            }
+            if (msval) {
+                //alert("OK5");
+                if (homnrvalue) {
+                    var rex = /^\d+$/;
+                    if (!homnrvalue.match(rex)) {
+                        alert("Hom. number ei ole number!");
+                        return;
+                    }
+                    if (parseInt(homnrvalue) < 1) {
+                        alert("Hom. number peab olema nullist suurem täisarv!");
+                        return;
+                    }
+                }
+                window.returnValue = msval + JR1 + homnrvalue + JR1 + psVal;
+                //window.returnValue = "tagasi antavad väärtused";
+                if (whatbrw=="Chrome"){
+                parent.document.getElementsByTagName('dialog')[0].close();
+            }else{
+                           
+                //window.showModalDialog.close();
+            window.close();
+            }
+
+            }
+
+        } //SetReturnV
+
+    </script>
+</head>
+
+<body style='background-color: buttonface' onload='LisaLoad()'>
+    <div id='id_body'></div>
+</body>
+
+</html>

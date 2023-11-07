@@ -1,0 +1,550 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+
+    <title>Sõnastikud</title>
+    <iframe src="https://ghbtns.com/github-btn.html?user=niutech&amp;repo=showModalDialog&amp;type=watch&amp;count=true"
+        height="30" width="118" frameborder="0" allowTransparency="true"></iframe>
+    <!--ühine-->
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcommon.js"></script>
+    <!--layout-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxLayout/codebase/skins/dhtmlxlayout_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxcontainer.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxLayout/codebase/dhtmlxlayout.js"></script>
+    <!--toolbar-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxToolbar/codebase/skins/dhtmlxtoolbar_dhx_web.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxToolbar/codebase/dhtmlxtoolbar.js"></script>
+    <!--menu-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxMenu/codebase/skins/dhtmlxmenu_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/dhtmlxmenu.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxMenu/codebase/ext/dhtmlxmenu_ext.js"></script>
+    <!--grid-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid_skins.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxGrid/codebase/skins/dhtmlxgrid_dhx_skyblue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_filter.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+    <!--windows-->
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.css">
+    <link rel="stylesheet" type="text/css" href="dhtmlx/dhtmlxWindows/codebase/skins/dhtmlxwindows_dhx_blue.css">
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxwindows.js"></script>
+    <script type="text/javascript" src="dhtmlx/dhtmlxWindows/codebase/dhtmlxcontainer.js"></script>
+    <!--EELex-->
+    <link rel="stylesheet" type="text/css" href="../css/script.css">
+    <script type="text/javascript" src="tools_dx.js"></script>
+    <script type="text/javascript" src="res_xml.js"></script>
+    <script type="text/javascript" src="komponendid_dx.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+
+    <style>
+        .grid_hover {
+            background-color: #7FFFD4;
+            font-size: 20px;
+        }
+    </style>
+    <script type="text/javascript">
+        // Massiivid, kus hoitakse m ja i-d
+        var array_m = [];
+        var array_i = [];
+
+        // Massiivid, kus hoitakse Vol-e ja G-d
+        var array_v = [];
+        var array_g = [];
+
+        // Tehtud valik
+        var cValik_m = "";
+        var cValik_i = "";
+        var cValik_v = "";
+        var cValik_g = "";
+
+        var cRetValueOk = "";
+
+
+
+
+        const ENUMVAL = 1;
+        const ET_COL = 2;
+        const EN_COL = 3;
+
+        const T_COL = 4;
+        const TA_COL = 5;
+
+        var dic_desc, sAppLang, sDestlang, PD, xsdFile, xsdType, usrName, docnDestColHead;
+        var idEnumsTable;
+        var idSeldRow, oRow;
+
+        var XsdDomText = " ";
+        var vaikimisi;
+        var enumValues;
+        var oDicXsdDOM;
+
+        var dUpdated;
+
+        const aArray_Code = [];
+        const aArray_Name = [];
+        const aArray_T = [];
+        const aArray_TA = [];
+        const aArray_OPT = [];
+        var nRowCount = 0;
+        var nRowID = 0;
+
+        dUpdated = false;
+        PD = "\uE001";
+
+        var inArg = parent.cDialogArg;
+        var aSplitArray = inArg.split(PD);
+        //window.alert(inArg);
+        //window.alert(aSplitArray[0]+ " * " + aSplitArray[1] + " * " + aSplitArray[2] + " * " + aSplitArray[3]);
+
+        //return;
+
+        dic_desc = aSplitArray[0]; // vms
+        var sVastus = aSplitArray[1]; // et
+        var sMarkSona = aSplitArray[2]; // märksõna nimetus (x:m või x:ter)
+        var sRez = aSplitArray[3]; // kui üks artikkel, siis "1", kui mitu siis "2"
+        var sDicpr = aSplitArray[4]; // näitab näit. x-si
+        var sV1 = aSplitArray[5]; //
+        var sG1 = aSplitArray[6]; //       
+ 
+        //window.alert(sVastus);
+
+        var oOutDom = BuildXMLFromString(sVastus);
+        //alert ("??? " + sVastus);
+         
+        //window.alert(sVastus);
+
+        /**
+        * ATS5 bodyOnLoad
+        * @method bodyOnLoad()
+        */
+        function bodyOnLoad() {
+            var ix;
+
+            //    window.dhx_globalImgPath = "html/dhtmlx/dhtmlxCombo/codebase/imgs/";
+
+            var layoutParent = document.getElementById("parentId");
+            //    var layoutParent = document.body;
+
+
+
+            var cPealkiri = "Sõnastikust (" + dic_desc + ") leitud märksõnade loend:";
+            dhxLayoutContent = new dhtmlXLayoutObject(layoutParent, "1C", "dhx_blue");
+            dhxLayoutContent.cells("a").setText(cPealkiri);
+            //    dhxLayoutContent.cells("a").hideHeader();
+            //*
+            //dhxLayoutContent.cells("b").hideHeader();
+            //dhxLayoutContent.cells("b").setHeight(100);
+            //dhxLayoutContent.cells("b").fixSize(false, true);
+            //*
+            //    dhxLayoutContent.setAutoSize("a;b", "a");
+
+
+
+            brGrid = dhxLayoutContent.cells("a").attachGrid();
+            brGrid.setImagePath("dhtmlx/dhtmlxGrid/codebase/imgs/");
+            brGrid.setHeader("Nr,Märksõna(m),Hom-number(i)");
+            brGrid.setInitWidths("50,320,100");
+            brGrid.setColAlign("center,left,center");
+            brGrid.enableEditEvents(true, true, false); // click, dblclick, F2
+            brGrid.setColSorting("int,str,str");
+            brGrid.setColTypes("ro,ro,ro");
+            brGrid.enableTooltips("false,false,false");
+            brGrid.setSkin("dhx_skyblue");
+            brGrid.enableRowsHover(true, 'grid_hover')
+            brGrid.enableLightMouseNavigation(false)
+
+            brGrid.enableAutoHeight(false, dhxLayoutContent.cells("a").getHeight() - 80, true);
+            //    brGrid.attachHeader(" ,#cspan,#text_search,#text_filter,#combo_filter,#text_filter,#combo_filter,#text_filter,#text_filter,#combo_filter");
+            //    // setStyle(ss_header, ss_grid, ss_selCell, ss_selRow)
+            //    brGrid.setStyle("background-color:navy;color:white; font-weight:bold;", "", "color:red;", "");
+            //    brGrid.setStyle("", "", "", "background-color:silver;");
+            brGrid.init();
+            brGrid.enableSmartRendering(true);
+
+            brGrid.attachEvent("onRowSelect", function (id, ind) {
+
+                gridOnRowSelect(id, ind);
+                KuvaClick()
+            });
+            //brGrid.attachEvent("onEditCell", doOnCellEdit);
+
+
+            brGrid.attachEvent("onclick", function (id, ind) {
+                //gridOnRightClick(id, ind, obj);
+                gridOnRowSelect(id, ind);
+            });
+
+            if (sRez == 1) {
+                DataLoady();
+            } else {
+                DataLoadx();
+            }
+
+
+        }
+
+        /**
+            * ATSV DataLoadx
+            * @method DataLoadx()
+            */
+        function DataLoadx() {
+
+
+            //window.alert(dic_desc);
+            //return;
+
+
+            var ccAttri, ccElemM, cVF, cG;
+
+            brGrid.clearAll(); // deletes all rows in the grid (kui argumendiks on veel 'true', siis koos päisega)
+
+            var A_ElemNodes = oOutDom.getElementsByTagName("A");
+
+            // Leiame Artiklite arvu
+            var nnALenght = A_ElemNodes.length;
+
+            if (nnALenght > 0) {
+
+                // Artikli for...
+                for (let i = 0; i < nnALenght; i++) {
+                    cVf = "";
+                    cG = "";
+
+                    // Saame köite nime
+                    var VF_ElemNodes = oOutDom.getElementsByTagName("vf");
+                    var VF_Node = VF_ElemNodes.item(i);
+                    cVF = VF_Node.childNodes[0].nodeValue;
+                    //
+
+                    // Saame G
+                    var G_ElemNodes = oOutDom.getElementsByTagName("G");
+                    var G_Node = G_ElemNodes.item(i);
+                    cG = G_Node.childNodes[0].nodeValue;
+                    //                    
+
+
+
+                    var A_Node = A_ElemNodes.item(i);
+                    var M_ElemNodes = A_Node.getElementsByTagName(sMarkSona);
+                    var nnMLenght = M_ElemNodes.length;
+
+                    for (let k = 0; k < nnMLenght; k++) {
+                        ccElemM = "";
+                        ccAttri = "";
+                        var M_Node = M_ElemNodes.item(k);
+                        ccElemM = M_Node.childNodes[0].nodeValue;
+
+                        // Leiame atribuudi i , kui see on
+                        if (M_Node.hasAttribute(sDicpr + ":i")) {
+                            ccAttri = M_ElemNodes.item(k).getAttribute(sDicpr + ":i");
+                        }
+
+                        array_m.push(ccElemM);
+                        array_i.push(ccAttri);
+                        array_v.push(cVF);
+                        array_g.push(cG);
+
+                        //window.alert(cVF + " -> " + ccElemM + " i=" + ccAttri);
+                        //window.alert(cG + " -> " + ccElemM + " i=" + ccAttri);
+
+
+
+                    } // "m" for
+
+                } // "A" for
+
+                // Tabeli moodustamine
+                var cArtKeys = "";
+                var nRidu = array_m.length;
+                if (nRidu > 0) {
+
+                    var rowsXml = "<rows>";
+                    for (ix = 0; ix < nRidu; ix++) {
+                        cArtKeys = array_m[ix] + PD + array_i[ix] + PD + array_v[ix] + PD + array_g[ix];
+
+                        rowsXml += "<row id='" + (ix + 1) + "'>";
+                        rowsXml += "<userdata name='artKeys'>" + array_m[ix] + PD + array_i[ix] + PD + array_v[ix] + PD + array_g[ix] + "</userdata>";
+                        //rowsXml += "<userdata name='artKeys'>" + cArtKeys + "</userdata>";
+                        rowsXml += "<cell>" + (ix + 1) + "</cell>";
+                        rowsXml += "<cell>" + array_m[ix] + "</cell>";
+                        rowsXml += "<cell>" + array_i[ix] + "</cell>";
+                        rowsXml += "</row>";
+
+                    }
+                    rowsXml += "</rows>";
+                    brGrid.parse(rowsXml);
+                }
+
+            }
+        }
+
+        /**
+             * ATSV DataLoady
+             * @method DataLoadx()
+             */
+        function DataLoady() {
+
+
+            //window.alert(dic_desc);
+            //return;
+
+
+            var ccAttri, ccElemM, cVF, cG;
+
+            brGrid.clearAll(); // deletes all rows in the grid (kui argumendiks on veel 'true', siis koos päisega)
+
+            array_m.push(sVastus);
+            array_i.push("");
+            array_v.push(sV1);
+            array_g.push(sG1);
+
+
+
+            // Tabeli moodustamine
+            var cArtKeys = "";
+            var nRidu = array_m.length;
+            if (nRidu > 0) {
+
+                var rowsXml = "<rows>";
+                for (ix = 0; ix < nRidu; ix++) {
+                    cArtKeys = array_m[ix] + PD + array_i[ix] + PD + array_v[ix] + PD + array_g[ix];
+
+                    rowsXml += "<row id='" + (ix + 1) + "'>";
+                    rowsXml += "<userdata name='artKeys'>" + array_m[ix] + PD + array_i[ix] + PD + array_v[ix] + PD + array_g[ix] + "</userdata>";
+                    //rowsXml += "<userdata name='artKeys'>" + cArtKeys + "</userdata>";
+                    rowsXml += "<cell>" + (ix + 1) + "</cell>";
+                    rowsXml += "<cell>" + array_m[ix] + "</cell>";
+                    rowsXml += "<cell>" + array_i[ix] + "</cell>";
+                    rowsXml += "</row>";
+
+                }
+                rowsXml += "</rows>";
+                brGrid.parse(rowsXml);
+            }
+
+        }
+
+
+
+
+
+
+
+        /**
+        * Kui rida on valitud
+        * 
+        * @method fillIfrTable
+        * @param {objekt} rowId, colInd
+        */
+        function gridOnRowSelect(rowId, colInd) {
+            doBrowseRead(rowId, colInd);
+        } // gridOnRowSelect
+
+        /**
+        * Rea andmete lugemine
+        * 
+        * @method doBrowseRead
+        * @param {objekt} rowId, colInd
+        */
+        function doBrowseRead(rowId, colInd) {
+            var userdata = brGrid.getUserData(rowId, "artKeys");
+            cValik_m = array_m[rowId - 1];
+            cValik_i = array_i[rowId - 1];
+            cValik_v = array_v[rowId - 1];
+            cValik_g = array_g[rowId - 1];
+
+            cRetValueOk = userdata;
+            //window.alert(cRetValueOk);
+            //window.alert("m = " + cValik_m +  " i = " + cValik_i);
+            //var zRet = atModalW(rowId,aArray_Code[rowId-1],aArray_Name[rowId-1]);
+            //RetData = window.prompt("Palun muutke nimetust:",userdata);
+        } // doBrowseRead
+
+        /**
+        * Väljub html-st
+        * 
+        * @method LoobuClick
+        */
+        function LoobuClick() {
+
+            try {
+                parent.dhxWins.window("browx").close();
+            }
+            catch (e) { };
+
+            parent.dhxWins.window("vbaas").close();
+
+        } //LoobuClick
+
+        /**
+        * Väljub html-st
+        * 
+        * @method ValiClick
+        */
+        function KuvaClick() {
+            if (cRetValueOk != "") {
+                //window.alert("Kuva sisu!")
+                //window.alert(cValik_v + " " + cValik_g);
+
+                parent.doViewArtBase("XML", cValik_v, cValik_g);
+                //parent.doViewArt("XML", cValik_v, cValik_g);
+
+            } else {
+                window.alert("Valikut ei ole tehtud! Määrake vajalik rida.");
+                return;
+            }
+        } //ValiClick
+
+        /**
+        * Väljub html-st
+        * 
+        * @method ValiClick
+        */
+        function ValiClick() {
+            if (cRetValueOk != "") {
+                window.returnValue = cRetValueOk;
+                parent.atsViiteValikReturn(cRetValueOk);
+                try {
+                    parent.dhxWins.window("browsex").close();
+                }
+                catch (e) { };
+
+                parent.dhxWins.window("viide").close();
+
+            } else {
+                window.alert("Valikut ei ole tehtud! Määrake vajalik rida.");
+                return;
+            }
+        } //ValiClick
+
+        /**
+        * Määrab browseri
+        * 
+        * @method WhatBrows
+        * @return browseri nimetus stringina
+        */
+        function WhatBrows() {
+            var retBrowser = "";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                retBrowser = 'Opera';
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                retBrowser = 'Chrome';
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                retBrowser = 'Safari';
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                retBrowser = 'Firefox';
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                retBrowser = 'IE';
+            }
+            else {
+                retBrowser = 'unknown';
+            }
+            return (retBrowser);
+        }
+
+        /**
+        * Teeb xml-nodest sellise xml-stringi, mis on xml.
+        *
+        * @method getXmlString
+        * @param {Object} node 
+        * @return {String} xml teksti kujul.
+        */
+        function getXmlString(node) {
+            var xmlString;
+            // IE MSXML esimesena, kuigi "if (window.XMLSerializer)" läheb IE9 all läbi.
+            // IE9-s toetab ainult xmldocument objekti, mitte elementi,
+            // IE8-s muidugi ei olegi "XMLSerializer" tuge
+            if ('xml' in node) {
+                xmlString = node.xml;
+            } else if (window.XMLSerializer) {
+                var serializer = new XMLSerializer();
+                xmlString = serializer.serializeToString(node);
+            }
+            return xmlString;
+        } // getXmlString
+
+        /**
+        * Teisendab Date objekti stringiks. 
+        * 
+        * @method GetXSDDateTime
+        * @param {Object} dNow 
+        * @returns {String} Kuupäev EELexis kasutataval kujul.
+        */
+        function GetXSDDateTime(dNow) {
+            var y4 = dNow.getFullYear();
+            var mo2 = (dNow.getMonth() < 9 ? '0' : '') + (dNow.getMonth() + 1);
+            var d2 = (dNow.getDate() < 10 ? '0' : '') + (dNow.getDate());
+            var h2 = (dNow.getHours() < 10 ? '0' : '') + (dNow.getHours());
+            var mi2 = (dNow.getMinutes() < 10 ? '0' : '') + (dNow.getMinutes());
+            var s2 = (dNow.getSeconds() < 10 ? '0' : '') + (dNow.getSeconds());
+            var sDateTime = y4 + '-' + mo2 + '-' + d2 + 'T' + h2 + ':' + mi2 + ':' + s2;
+            return sDateTime;
+        } //GetXSDDateTime
+
+        /**
+        *  Teeb XML prefiksist nimeruumi URI.
+        * 
+        * @method NSResolver
+        * @param {String} nsPrefix
+        */
+        function NSResolver(nsPrefix) {
+            if (nsPrefix == DICPR) {
+                return DICURI;
+            } else if (nsPrefix == SDPR) {
+                return SDURI;
+            } else if (nsPrefix == NS_XS_PR) {
+                return NS_XS;
+            } else if (nsPrefix == "xml") {
+                return NS_XML;
+            } else if (nsPrefix == NS_XSL_PR) {
+                return NS_XSL;
+            }
+            return null;
+        }
+    </script>
+
+
+
+    <!--css-->
+    <style>
+        .myDiv {
+            text-align: center;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            overflow: auto;
+            background-color: #ececec;
+        }
+    </style>
+</head>
+
+<body onload="bodyOnLoad()">
+    <div id="parentId" style="width:100%;height:80%;">
+    </div>
+    <div class="myDiv" id='id_body'></div>
+    <div class="myDiv">
+
+
+        <input id="loobu" name="loobu" onclick="LoobuClick()" type="button" value="Sule aknad..." tabindex="1">
+    </div>
+</body>
+
+</html>

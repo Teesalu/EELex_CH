@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=EmulateIE9">
+    <script type="text/javascript">
+        var dic_desc;
+        //-----------------------------------------------------------------------------------
+        function displayTexts() {
+            document.getElementById("lblMs").innerHTML = "Uue artikli märksõna:";
+            document.getElementById("lblHomNr").innerHTML = "Märksõna homonüüminumber:";
+            document.getElementById("lblPs").innerHTML = "Põhisõna tunnus:";
+            document.getElementById("lisa").value = "Lisa uus artikkel...";
+            document.title = "Artikli lisamine";
+        }
+        //-----------------------------------------------------------------------------------
+        function LisaLoad() {
+            displayTexts();
+            window.returnValue = "*";
+        } //LisaLoad
+
+
+        //-----------------------------------------------------------------------------------
+        function HandleBodyKeyUp() {
+            var keyCode = ('which' in event) ? event.which : event.keyCode;
+            if (keyCode == 27) {
+                window.close();
+            } else if (keyCode == 13) {
+                SetReturnV();
+            }
+        } //HandleBodyKeyUp
+        //-----------------------------------------------------------------------------------
+        function LoobuClick() {
+            var cRetValue = "*";
+            parent.dhxWins.window("artadd").close();
+        } //LoobuClick
+
+        function WhatBrows() {
+            var retBrowser = "";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                retBrowser = 'Opera';
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                retBrowser = 'Chrome';
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                retBrowser = 'Safari';
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                retBrowser = 'Firefox';
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                retBrowser = 'IE';
+            }
+            else {
+                retBrowser = 'unknown';
+            }
+            return (retBrowser);
+        }
+        //-----------------------------------------------------------------------------------
+        function LisaClick() {
+            //alert("OK1");
+            SetReturnV();
+        } //LisaClick
+        //-----------------------------------------------------------------------------------
+        function SetReturnV() {
+            //var JR1 = "\uE001";
+            var JR1 = "#";
+            var msval = ms.value;
+            var homnrvalue = homnr.value;
+            var psVal = ps.value;
+            var cRetValue = "";
+
+            if (msval) {
+                if (homnrvalue) {
+                    var rex = /^\d+$/;
+                    if (!homnrvalue.match(rex)) {
+                        alert("Hom. number ei ole number!");
+                        return;
+                    }
+                    if (parseInt(homnrvalue) < 1) {
+                        alert("Hom. number peab olema nullist suurem täisarv!");
+                        return;
+                    }
+                }
+                cRetValue = msval + JR1 + homnrvalue + JR1 + psVal;
+            } else {
+                window.alert("Tekkis viga ja uut artiklit ei loodud!");
+                cRetValue = "*";
+            }            
+
+            parent.imgArtAddClick_dx(cRetValue);
+            parent.dhxWins.window("artadd").close();
+
+        } //SetReturnV
+
+    </script>
+</head>
+
+<body style="background-color: white" onload="LisaLoad()">
+    <div id="id_body">
+        <br />
+
+        <br />
+        <label id="lblMs" for="ms" style="font-size: small">
+        </label>
+
+        <br />
+        <input id="ms" name="ms" type="text" size="40" tabindex="1" />
+        <br />
+        <br />
+        <label id="lblHomNr" for="homnr" style="font-size: small">
+        </label>
+        <br />
+        <input id="homnr" name="homnr" type="text" size="40" tabindex="2" />
+        <br />
+
+        <label id="lblPs" for="ps" style="font-size: x-small; visibility: hidden">
+        </label>
+        <br />
+        <input id="ps" name="ps" type="text" size="40" tabindex="3" style="visibility: hidden" />
+        <br />
+        <input id="loobu" name="loobu" onclick="LoobuClick()" type="button" value="Loobu" tabindex="4">
+        <input id="lisa" name="lisa" onclick="LisaClick()" type="button" value="Lissada artikkel..." tabindex="5">
+
+    </div>
+</body>
+
+</html>

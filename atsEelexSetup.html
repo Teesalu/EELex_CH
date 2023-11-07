@@ -1,0 +1,408 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>EELex sätted</title>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="pragma" content="no-cache">
+    <!--<meta http-equiv="refresh" content="10">-->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="Ain Teesalu">
+    <meta name="keywords" content="EELex">
+    <script type="text/javascript" src="tools_dx.js"></script>
+    <script type="text/javascript" src="lisad.js"></script>
+
+    <script type="text/javascript">
+
+        window.returnValue = "*";
+        var PD = "\uE001";
+        var dic_desc, sAppLang, retVal, usrName, smdArgs, cMaxLeid, cMaxPrint, cPeatoim;
+        var dExe = false;
+        var eeLexAdmin;
+        var msIE = false;
+        var cRetElem = "";
+
+        /**
+         * Alglaadimine
+         * 
+         * @method bodyOnLoad
+         */
+        function bodyOnLoad() {
+
+            //window.alert(window.dialogArguments);
+            var inArr = parent.cDialogArg.split(PD);
+
+            dic_desc = inArr[0];
+            sAppLang = inArr[1];
+            usrName = inArr[3];
+            //cMaxLeid = inArr[5];
+            //cMaxPrint = inArr[6];
+
+            //window.alert("cMaxLeid=" + cMaxLeid + " cMaxPrint=" + cMaxPrint);
+
+            var oConfigDOM;
+            if (!(oConfigDOM = IDD("File", "../shsconfig_" + dic_desc + ".xml", false, false, null)))
+                return;
+
+
+            // Sõnastiku sulgemine hooldustöödeks
+            var confElem = oConfigDOM.documentElement.getElementsByTagName("msg")[0];
+            if (confElem) {
+                if (confElem.getAttribute("type") == "stop") {
+                    chkLukusta.checked = true;
+                }
+            }
+
+            // Uue artikli loomise dialoog (yes/no)
+            confElem = oConfigDOM.documentElement.getElementsByTagName("newArtDlg")[0];
+            if (confElem) {
+                chkNewArtDlg.checked = jsStringToBoolean(xmlElementTextValue(confElem));
+
+                // window.alert(jsStringToBoolean(xmlElementTextValue(confElem)));
+            }
+            else {
+                chkNewArtDlg.checked = true;
+            }
+
+            // Kas märksõna on unikaalne? (yes/no)
+            confElem = oConfigDOM.documentElement.getElementsByTagName("mustBeUnique")[0];
+            if (confElem) {
+                chkMustBeUnique.checked = jsStringToBoolean(xmlElementTextValue(confElem));
+            }
+            else {
+                chkMustBeUnique.checked = true;
+            }
+
+            // Kas viitekontroll on? (yes/no)
+            confElem = oConfigDOM.documentElement.getElementsByTagName("vcont")[0];
+            if (confElem) {
+                chkUseViitc.checked = jsStringToBoolean(xmlElementTextValue(confElem));
+            }
+            else {
+                chkUseViitc.checked = true;
+            }
+
+            // Kuvatav artiklite arv?
+            cMaxLeid = oConfigDOM.documentElement.getElementsByTagName("max_leiud")[0].textContent;
+
+            // Trükitav artiklite arv?
+            cMaxPrint = oConfigDOM.documentElement.getElementsByTagName("max_print_arts")[0].textContent;
+
+            cPeatoim = oConfigDOM.documentElement.getElementsByTagName("ptd")[0].textContent;
+
+
+            var shsConf = IDD("File", "../shsConfig.xml", false, false, null);
+            eeLexAdmin = xmlElementTextValue(shsConf.documentElement.getElementsByTagName("eeLexAdmin")[0]);
+
+            //window.alert(eeLexAdmin);
+
+
+            if (eeLexAdmin.indexOf(";" + usrName + ";") > -1) {
+                tdLukusta.style.visibility = "visible";
+                tdNewArtDlg.style.visibility = "visible";
+                tdMustBeUnique.style.visibility = "visible";
+                tdUseViitc.style.visibility = "visible";
+                dExe = true; 
+            } else {
+
+                if (cPeatoim.indexOf(";" + usrName + ";") > -1) {
+                    tdLukusta.style.visibility = "visible";
+                    tdNewArtDlg.style.visibility = "visible";
+                    tdMustBeUnique.style.visibility = "visible";
+                    tdUseViitc.style.visibility = "visible";
+                    dExe = true; 
+                }
+
+            }
+            //tdUseViitc.style.visibility = "visible";
+        } //bodyOnLoad
+
+
+        /**
+        * Salvestamine
+        * 
+        * @method SetReturnV
+        */
+        function SetReturnV() {
+            var xh, oRespDom, sta, cRet;
+
+            // 1. Sõnastiku lukustamine...
+            if (dExe == true) {
+                // 1. lukustamine...
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "msg" + PD + chkLukusta.checked.toString());
+                if ((xh.statusText == "OK")) {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Sõnastiku lukustamise salvestamine ei õnnestunud!");
+                            return (-1);
+                        }
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    return (-1);
+                }
+                cRetElem = cRetElem + chkLukusta.checked.toString() + PD;
+
+                // 2. uue artikli dialoog...
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "newArtDlg" + PD + chkNewArtDlg.checked.toString());
+                if (xh.statusText == "OK") {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Uue artikli dialoogi väärtuse salvestamine ei õnnestunud!");
+                            return (-1);
+                        }
+                        //dhxBar.disableItem("btnLisaArtikkel");
+
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    return (-1);
+                }
+                cRetElem = cRetElem + chkNewArtDlg.checked.toString() + PD;
+
+                // 3. märksõna on unikaalne
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "mustBeUnique" + PD + chkMustBeUnique.checked.toString());
+                if (xh.statusText == "OK") {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Märksõna unikaalsuse väärtuse salvestamine ei õnnestunud!");
+                            window.returnValue = "";
+                            return (-1);
+                        }
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    window.returnValue = "";
+                    return (-1);
+                }
+                cRetElem = cRetElem + chkMustBeUnique.checked.toString() + PD;
+
+                // 4. viitekontroll...
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "vcont" + PD + chkUseViitc.checked.toString());
+                if ((xh.statusText == "OK")) {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Viitekontrolli kasutamise väärtuse salvestamine ei õnnestunud!");
+                            return (-1);
+                        }
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    return (-1);
+                }
+                cRetElem = cRetElem + chkUseViitc.checked.toString() + PD;
+
+                // 5. Kuvatavate artklite arv...
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "max_leiud" + PD + cMaxLeid);
+                if ((xh.statusText == "OK")) {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Kuvatavate artklite arvu salvestamine ei õnnestunud!");
+                            return (-1);
+                        }
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    return (-1);
+                }
+                cRetElem = cRetElem + cMaxLeid + PD;
+
+                // 5. Trükitavate artklite arv...
+                xh = exCGISync("../tools.cgi", "exsaSetField" + PD + dic_desc + PD + usrName + PD + "shsconfig_" + dic_desc + ".xml" + PD + "max_print_arts" + PD + cMaxPrint);
+                if ((xh.statusText == "OK")) {
+                    oRespDom = ParseHTTPResponse(xh);
+                    if (oRespDom) {
+                        var opStatus = getXmlSingleNodeValue(oRespDom, "rsp/sta");
+                        if (opStatus != "Success") {
+                            window.alert("Trükitavate artklite arvu salvestamine ei õnnestunud!");
+                            return (-1);
+                        }
+                    }
+                } else {
+                    window.alert(xh.status + ": " + xh.statusText + '\r\n\r\n' + xh.responseText);
+                    return (-1);
+                }
+                cRetElem = cRetElem + cMaxPrint;
+            }
+            return (0);
+        } //SetReturnV
+
+        /**
+        * Väljub html-st OK klahviga
+        * 
+        * @method btnOkOnClick
+        */
+        function btnOkOnClick() {
+            var cRetx = "";
+            var zRet = SetReturnV();
+            if (zRet == "0") {
+                cRetx = cRetElem;
+            } else {
+                cRetx = "";
+            }
+            parent.atsSetupReturn(cRetx);
+            parent.dhxWins.window("setup").close();
+
+        } //btnOkOnClick
+
+        /**
+        * Väljub html-st
+        * 
+        * @method btnCancelOnClick()
+        */
+        function btnCancelOnClick() {
+            var cRetx = "*";
+            parent.atsSetupReturn(cRetx);
+            parent.dhxWins.window("setup").close();
+        } //btnCancelOnClick()
+
+        /**
+        * Määrab browseri
+        * 
+        * @method WhatBrows
+        * @return browseri nimetus stringina
+        */
+        function WhatBrows() {
+            var retBrowser = "";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                retBrowser = 'Opera';
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                retBrowser = 'Chrome';
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                retBrowser = 'Safari';
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                retBrowser = 'Firefox';
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                retBrowser = 'IE';
+            }
+            else {
+                retBrowser = 'unknown';
+            }
+            return (retBrowser);
+        }
+        /**
+         *  Teeb XML prefiksist nimeruumi URI.
+         * 
+         * @method NSResolver
+         * @param {String} nsPrefix
+         */
+        function NSResolver(nsPrefix) {
+            if (nsPrefix == DICPR) {
+                return DICURI;
+            } else if (nsPrefix == SDPR) {
+                return SDURI;
+            } else if (nsPrefix == NS_XS_PR) {
+                return NS_XS;
+            } else if (nsPrefix == "xml") {
+                return NS_XML;
+            } else if (nsPrefix == NS_XSL_PR) {
+                return NS_XSL;
+            }
+            return null;
+        }
+
+        /**
+         *  Sisestada artiklite arv kuvamisel ja trükil
+         * 
+         * @method ViewPrintArt
+         * @param {String} cValik
+         */
+        function ViewPrintArt(cValik) {
+            var cMaxL, cMaxP, nMaxLeid, nMaxPrint;
+            cMaxL = cMaxLeid;
+            cMaxP = cMaxPrint;
+            if (cValik == "1") {
+                cMaxL = prompt("Kuvatav artiklite arv:", cMaxL);
+                if (cMaxL == null || cMaxL == "") {
+                    return;
+                }
+            } else {
+                cMaxP = prompt("Trükitav artiklite arv:", cMaxP);
+                if (cMaxP == null || cMaxP == "") {
+                    return;
+                }
+            }
+            nMaxLeid = parseInt(cMaxL);
+            nMaxPrint = parseInt(cMaxP)
+            if (nMaxLeid >= nMaxPrint) {
+                window.alert("Trükitavate artiklite arv peab olema suurem kuvatavate artiklite arvust!");
+            } else {
+                cMaxLeid = cMaxL;
+                cMaxPrint = cMaxP;
+            }
+        }
+    </script>
+</head>
+
+<body style="background-color: white" onload="bodyOnLoad()">
+    <div id="id_body" style="padding: 5mm 0 0 10mm;">
+        <table id="tblLinnukesed" border="0">
+            <tr>
+                <td id="tdLukusta" style="visibility: hidden;">
+                    <input tabindex="1" id="chkLukusta" type="checkbox" />
+                    <label id="lblLukusta" for="chkLukusta">
+                        lukusta sõnastik (hooldustöödeks vms)</label>
+                </td>
+            </tr>
+            <tr>
+                <td id="tdNewArtDlg" style="visibility: hidden;">
+                    <input tabindex="2" id="chkNewArtDlg" type="checkbox" />
+                    <label id="lblNewArtDlg" for="chkNewArtDlg">
+                        uue artikli lisamise dialoog</label>
+                </td>
+            </tr>
+            <tr>
+                <td id="tdMustBeUnique" style="visibility: hidden;">
+                    <input tabindex="3" id="chkMustBeUnique" type="checkbox" />
+                    <label id="lblMustBeUnique" for="chkMustBeUnique">
+                        märksõna on unikaalne</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <hr />
+                </td>
+            </tr>
+            <tr>
+                <td id="tdUseViitc" style="visibility: hidden;">
+                    <input tabindex="4" id="chkUseViitc" type="checkbox" />
+                    <label id="useRPM" for="chkUseViitc">
+                        kasuta viitekontrolli</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <hr />
+                </td>
+            </tr>
+            <tr>
+                <td id="tdViewPrint">
+                    <button onclick="ViewPrintArt('1')">Kuvatav artiklite arv</button>
+                    <button onclick="ViewPrintArt('2')">Trükitav artiklite arv</button>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <br />
+        <input id="btnOK" onclick="btnOkOnClick()" type="button" value=" Salvesta " style="width: 3cm" />
+        <input id="btnCancel" onclick="btnCancelOnClick()" type="button" value="  Loobu  " style="width: 3cm" />
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        var dic_desc, sAppVer, sUser;
+        PD = "\uE001";
+        var inArg = parent.cDialogArg;
+        var aSplitArray = inArg.split(PD);
+
+        dic_desc = aSplitArray[0];
+        sAppVer = aSplitArray[1];
+        sUser = aSplitArray[2];
+        sDic = aSplitArray[3];
+
+    </script>
+
+    <style>
+        div {
+            margin-bottom: 15px;
+            padding: 4px 12px;
+            text-align: center;
+        }
+
+        .info {
+            background-color: rgb(242, 241, 227);
+        }
+    </style>
+</head>
+
+<body class="info">
+
+    <div>
+
+        <p><strong>* Tere tulemast! *</strong></p>
+        <p></p>
+        <p id="vers"></p>
+        <p id="usr"></p>
+    </div>
+    <script type="text/javascript">
+        var zVer = "EELex (CH) ver. " + sAppVer;
+        var zUsr = sUser;
+        //document.getElementById("vers").innerHTML = zVer;
+        //document.getElementById("dic").innerHTML = sDic;
+        document.getElementById("usr").innerHTML = zUsr; 
+
+</script>
+</body>
+<script type="text/javascript">
+setTimeout(() => {  parent.dhxWins.window("startee").close(); }, 3000);
+//<p id="vers"></p>
+//<p id="dic"></p>
+</script>    
+</html>
