@@ -1,0 +1,214 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="copyright" content="Eesti Keele Instituut">
+    <meta name="keywords" content="EELex">
+    <meta http-equiv="cache-control" content="no-cache">
+    <title>Menüü</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: "Lato", sans-serif;
+        }
+
+        /* Style the tab */
+        .tab {
+            float: left;
+            border: 0px solid #ccc;
+            background-color: #f1f1f1;
+            width: 100%;
+            height: 100px;
+        }
+
+        /* Style the buttons inside the tab */
+        .tab button {
+            display: block;
+            background-color: inherit;
+            color: black;
+            padding: 6px 16px;
+            width: 100%;
+            border: none;
+            outline: yes;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current "tab button" class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            float: left;
+            padding: 0px 12px;
+            border: 0px solid #ccc;
+            width: 70%;
+            border-left: none;
+            height: 200px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var cElemz, cOptionz, PD, retVal, cPath;
+        PD = "\uE001";
+        window.returnValue = "";
+
+
+        /**
+       * ATS-xmlCopy
+       * 
+       * @method bodyOnLoad
+       */
+        function bodyOnLoad() {
+
+            var inArg = parent.cDialogArg;
+
+            //window.alert(inArg);
+
+            var aSplitArray = inArg.split(PD);
+            cElemz = aSplitArray[0];
+            cOptionz = aSplitArray[1];
+            cPath = aSplitArray[2];
+            cCElemName = aSplitArray[3];
+            document.getElementById("kopID").innerHTML = "Kopeerida (" + cCElemName +")";
+        }
+
+        /**
+        * Määrab browseri
+        * 
+        * @method WhatBrows
+        * @return browseri nimetus stringina
+        */
+        function WhatBrows() {
+            var retBrowser = "";
+            if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
+                retBrowser = 'Opera';
+            }
+            else if (navigator.userAgent.indexOf("Chrome") != -1) {
+                retBrowser = 'Chrome';
+            }
+            else if (navigator.userAgent.indexOf("Safari") != -1) {
+                retBrowser = 'Safari';
+            }
+            else if (navigator.userAgent.indexOf("Firefox") != -1) {
+                retBrowser = 'Firefox';
+            }
+            else if ((navigator.userAgent.indexOf("MSIE") != -1) || (!!document.documentMode == true)) //IF IE > 10
+            {
+                retBrowser = 'IE';
+            }
+            else {
+                retBrowser = 'unknown';
+            }
+            return (retBrowser);
+        }
+
+        /**
+        *  Teeb XML prefiksist nimeruumi URI.
+        * 
+        * @method NSResolver
+        * @param {String} nsPrefix
+        */
+        function NSResolver(nsPrefix) {
+            if (nsPrefix == DICPR) {
+                return DICURI;
+            } else if (nsPrefix == SDPR) {
+                return SDURI;
+            } else if (nsPrefix == NS_XS_PR) {
+                return NS_XS;
+            } else if (nsPrefix == "xml") {
+                return NS_XML;
+            } else if (nsPrefix == NS_XSL_PR) {
+                return NS_XSL;
+            }
+            return null;
+        }
+
+        /**
+        * Väljub html-st OK klahviga
+        * 
+        * @method btnOkOnClick
+        */
+        function btnOkOnClick(cRetElem) {
+            parent.atsCMenuChoose(cRetElem,cPath);
+            parent.dhxWins.window("cmenu").close();
+        } //btnOkOnClick
+
+        /**
+        * Väljub html-st
+        * 
+        * @method btnCancelOnClick()
+        */
+        function btnCancelOnClick() {
+            window.returnValue = "*";
+            var xBrs = WhatBrows();
+            if (xBrs == "Safari") {
+                window.close();
+            }
+            else {
+                //alert("OK");
+                parent.document.getElementsByTagName('dialog')[0].close();
+            }
+        } //btnCancelOnClick()
+
+       // <button class="tablinks" onclick="openCity(event, 'C')">Kopeerida</button><button class="tablinks" onclick="openCity(event, 'PB')">Taastada (ette)</button><button class="tablinks" onclick="openCity(event, 'PN')">Taastada (järgi)</button><button class="tablinks" onclick="openCity(event, 'R')">Asendada</button>
+       // <button class="tablinks" onclick="openCity(event, 'PN')">Taastada (järgi)</button>
+       // <button class="tablinks" onclick="openCity(event, 'R')">Asendada</button>
+       //<button class="tablinks" onclick="openCity(event, 'C')">Kopeerida</button>
+
+    </script>
+
+
+</head>
+
+<body style="background-color: #f1f1f1;" onload="bodyOnLoad()">
+
+    <div class="tab" id="bodyID">
+        <button id="kopID" class="tablinks" onclick="openCity(event, 'C')">Kopeerida</button>
+        <button class="tablinks" onclick="openCity(event, 'PB')">Aseta (ette)</button>
+        <button class="tablinks" onclick="openCity(event, 'PN')">Aseta (järgi)</button>
+        <button class="tablinks" onclick="openCity(event, 'R')">Asendada</button>
+        <button class="tablinks" onclick="openCity(event, 'D')">Kustutada</button>
+    </div>
+
+    <script>
+        function openCity(event, menyyID) {
+            //window.alert(menyyID);
+            if (menyyID == "C" || menyyID == "PB" || menyyID == "PN" || menyyID == "R" || menyyID == "D") {
+                btnOkOnClick(menyyID);
+            }
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+
+            }
+            document.getElementById(cityName).style.display = "block";
+            event.currentTarget.className += " active";
+        }
+
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+
+    </script>
+
+</body>
+
+</html>
